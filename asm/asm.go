@@ -134,6 +134,8 @@ func Str2Op(i string) uint8 {
 		return OP_MOV
 	case "jnz":
 		return OP_JNZ
+	case "fail":
+		return OP_FAIL
 	}
 
 	panic("no such op: " + i)
@@ -180,10 +182,8 @@ func Asm(ec *EmitContext, i string) {
 		switch flds[0] {
 		case ".c":
 			return
-		case "nop":
-			EmitOP(ec, OP_NOP, 0, 0)
-		case "hlt":
-			EmitOP(ec, OP_HLT, 0, 0)
+		case "nop","hlt","fail":
+			EmitOP(ec, Str2Op(flds[0]), 0, 0)
 		default:
 			panic("can't handle this")
 		}

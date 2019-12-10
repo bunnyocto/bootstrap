@@ -3,12 +3,12 @@ package cpu
 import . "bootstrap/defs"
 import "fmt"
 
-func Execute(regs []uint32, memory []uint8) {
+func Execute(regs []uint32, memory []uint8) uint8 {
 	fmt.Printf("%X\n", memory)
 
 	for {
 		if regs[REG_IP] >= uint32(len(memory)) {
-			return
+			return 5
 		}
 
 		i := memory[regs[REG_IP]]
@@ -17,7 +17,7 @@ func Execute(regs []uint32, memory []uint8) {
 		if i <= OP_LDCC {
 			// fetch uint32
 			if regs[REG_IP]+3 >= uint32(len(memory)) {
-				return
+				return 4
 			}
 			c0 := memory[regs[REG_IP]]
 			regs[REG_IP]++
@@ -41,11 +41,11 @@ func Execute(regs []uint32, memory []uint8) {
 			case OP_LDCC:
 				regs[REG_C] = value
 			default:
-				return
+				return 3
 			}
 		} else {
 			if regs[REG_IP] >= uint32(len(memory)) {
-				return
+				return 2
 			}
 
 			b1 := memory[regs[REG_IP]]
@@ -88,9 +88,11 @@ func Execute(regs []uint32, memory []uint8) {
 			case OP_MOV:
 				regs[dst] = regs[src]
 			case OP_HLT:
-				return
+				return 0
+			case OP_FAIL:
+				return 255
 			default:
-				return
+				return 1
 			}
 		}
 	}

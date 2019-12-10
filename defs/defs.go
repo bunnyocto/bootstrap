@@ -25,6 +25,7 @@ const OP_JNZ = 0x31
 
 const OP_LDB = 0x40
 
+const OP_FAIL = 0xFC
 const OP_OUT = 0xFD
 const OP_HLT = 0xFE
 const OP_NOP = 0xFF
