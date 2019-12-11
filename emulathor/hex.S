@@ -8,8 +8,8 @@
 .l _hexTable
 	strdata MDEyMzQ1Njc4OUFCQ0RFRg==
 .l byteToHexCh
-	push	sp	ra
-	push	sp	rb
+	push	ro	ra
+	push	ro	rb
 	
 	ldca	0x04
 	.adrb	_hexTable
@@ -33,7 +33,7 @@
 	ldb		rm	rb
 	stb		rj	rb
 	
-	pop		ra	sp
-	pop		rb	sp
+	pop		ra	ro
+	pop		rb	ro
 	
-	ret
+	ret		ro

@@ -14,8 +14,8 @@ const REG_J = 0x0A
 const REG_K = 0x0B
 const REG_L = 0x0C
 const REG_M = 0x0D
-const REG_BP = 0x0E
-const REG_SP = 0x0F
+const REG_N = 0x0E
+const REG_O = 0x0F
 
 const OP_LDCA = 0x00
 const OP_LDCB = 0x01
@@ -40,6 +40,8 @@ const OP_SHL = 0x12
 const OP_JMP = 0x30
 const OP_JNZ = 0x31
 const OP_JIZ = 0x32
+const OP_CALL = 0x33
+const OP_RET = 0x34
 
 const OP_LDB = 0x40
 const OP_STB = 0x41

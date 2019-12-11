@@ -536,3 +536,67 @@ func TestShr(t *testing.T) {
 		t.Fatalf("Expected %x but got %x!", 0x1234, regs[REG_A])
 	}
 }
+
+func TestCall(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewDefaultEmitContext()
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldca 2048",
+			".adrb func",
+			"call rb ra",
+			"hlt",
+			".l func",
+			"hlt",
+		})
+	ec.Resolve()
+	
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 2052 {
+		t.Fatalf("Expected %x but got %x!", 2052, regs[REG_A])
+	}
+	
+	if ec.Memory()[2048] != 0x00 {
+		t.Fatalf("Expected %x but got %x!", 0x00, ec.Memory()[2048])
+	}
+	
+	if ec.Memory()[2049] != 0x00 {
+		t.Fatalf("Expected %x but got %x!", 0x00, ec.Memory()[2049])
+	}
+	
+	if ec.Memory()[2050] != 0x04 {
+		t.Fatalf("Expected %x but got %x!", 0x04, ec.Memory()[2050])
+	}
+	
+	if ec.Memory()[2051] != 0x0C {
+		t.Fatalf("Expected %x but got %x!", 0x0C, ec.Memory()[2051])
+	}
+}
+
+func TestRet(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewDefaultEmitContext()
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldca 2048",
+			".adrb func",
+			"call rb ra",
+			"hlt",
+			".l func",
+			"ret ra",
+		})
+	ec.Resolve()
+	
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 2048 {
+		t.Fatalf("Expected %x but got %x!", 2052, regs[REG_A])
+	}
+	
+	if regs[REG_IP] != 1024+5+5+2+2 {
+		t.Fatalf("Terminated on wrong instruction!")
+	}
+}

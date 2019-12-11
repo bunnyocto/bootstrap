@@ -85,36 +85,38 @@ func EmitOP(ec *EmitContext, op uint8, dst uint8, src uint8) {
 
 func Str2Reg(i string) uint8 {
 	switch i {
-	case "ra":
+	case "ra","A":
 		return REG_A
-	case "rb":
+	case "rb","B":
 		return REG_B
-	case "rc":
+	case "rc","C":
 		return REG_C
-	case "rd":
+	case "rd","D":
 		return REG_D
-	case "re":
+	case "re","E":
 		return REG_E
-	case "rf":
+	case "rf","F":
 		return REG_F
-	case "rg":
+	case "rg","G":
 		return REG_G
-	case "rh":
+	case "rh","H":
 		return REG_H
-	case "ri":
+	case "ri","I":
 		return REG_I
-	case "rj":
+	case "rj","J":
 		return REG_J
-	case "rk":
+	case "rk","K":
 		return REG_K
-	case "rl": 
+	case "rl","L": 
 		return REG_L
-	case "rm":
+	case "rm","M":
 		return REG_M
-	case "bp":
-		return REG_BP
-	case "sp":
-		return REG_SP
+	case "rn","N":
+		return REG_N
+	case "ro","O":
+		return REG_O
+	case "rip","IP":
+		return REG_IP
 	}
 
 	panic("no such reg: " + i)
@@ -166,6 +168,12 @@ func Str2Op(i string) uint8 {
 		return OP_SHL
 	case "shr":
 		return OP_SHR
+	case "stb":
+		return OP_STB
+	case "call":
+		return OP_CALL
+	case "ret":
+		return OP_RET
 	}
 
 	panic("no such op: " + i)
@@ -278,7 +286,7 @@ func Asm(ec *EmitContext, i string) {
 		case "ldca", "ldcb", "ldcc":
 			val, _ := strconv.ParseUint(flds[1], 0, 32)
 			EmitLDC(ec, Str2Op(flds[0]), uint32(val))
-		case "inc", "dec", "jmp":
+		case "inc", "dec", "jmp", "ret":
 			EmitOP(ec, Str2Op(flds[0]), Str2Reg(flds[1]), 0)
 		default:
 			panic("can't handle this")

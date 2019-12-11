@@ -103,12 +103,32 @@ func Execute(regs []uint32, memory []uint8) uint8 {
 				}
 			case OP_LDB:
 				regs[dst] = uint32(memory[regs[src]])
+			case OP_STB:
+				memory[regs[dst]] = uint8(regs[src] & 0xFF)
 			case OP_MOV:
 				regs[dst] = regs[src]
 			case OP_HLT:
 				return 0
 			case OP_FAIL:
 				return 255
+			case OP_CALL:
+				b0 := uint8((regs[REG_IP] >> 24) & 0xFF)
+				b1 := uint8((regs[REG_IP] >> 16) & 0xFF)
+				b2 := uint8((regs[REG_IP] >>  8) & 0xFF)
+				b3 := uint8((regs[REG_IP] >>  0) & 0xFF)
+				memory[regs[src]+0] = b0
+				memory[regs[src]+1] = b1
+				memory[regs[src]+2] = b2
+				memory[regs[src]+3] = b3
+				regs[src]+=4
+				regs[REG_IP] = regs[dst]
+			case OP_RET:
+				regs[dst] -= 4
+				b0 := memory[regs[dst]+0]
+				b1 := memory[regs[dst]+1]
+				b2 := memory[regs[dst]+2]
+				b3 := memory[regs[dst]+3]
+				regs[REG_IP] = uint32(b0) << 24 | uint32(b1) << 16 | uint32(b2) << 8 | uint32(b3)
 			case OP_PUSH:
 				b0 := uint8((regs[src] >> 24) & 0xFF)
 				b1 := uint8((regs[src] >> 16) & 0xFF)
