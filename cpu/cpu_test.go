@@ -94,8 +94,9 @@ func TestAdd(t *testing.T) {
 
 func TestSub(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	memory := make([]uint8, 0x100)
+	memory := make([]uint8, 4096)
 	base := memory
+	memory = memory[1024:]
 
 	memory = emit_ldc(memory, OP_LDCB, 0x12345678)
 	memory = emit_ldc(memory, OP_LDCC, 0x23451209)
@@ -111,8 +112,9 @@ func TestSub(t *testing.T) {
 
 func TestMul(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	memory := make([]uint8, 0x100)
+	memory := make([]uint8, 0x4096)
 	base := memory
+	memory = memory[1024:]
 
 	memory = emit_ldc(memory, OP_LDCB, 0x1234)
 	memory = emit_ldc(memory, OP_LDCC, 0x23)
@@ -130,8 +132,9 @@ func TestMul(t *testing.T) {
 
 func TestDiv(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	memory := make([]uint8, 0x100)
+	memory := make([]uint8, 4096)
 	base := memory
+	memory = memory[1024:]
 
 	memory = emit_ldc(memory, OP_LDCB, 0x1234)
 	memory = emit_ldc(memory, OP_LDCC, 0x23)
@@ -199,8 +202,8 @@ func TestLra(t *testing.T) {
 
 	Execute(regs, ec.Memory())
 
-	if regs[REG_A] != 5 {
-		t.Fatalf("Expected %x but got %x!", 5, regs[REG_A])
+	if regs[REG_A] != 0x405 {
+		t.Fatalf("Expected %x but got %x!", 0x405, regs[REG_A])
 	}
 }
 
@@ -218,8 +221,8 @@ func TestLrb(t *testing.T) {
 
 	Execute(regs, ec.Memory())
 
-	if regs[REG_B] != 5 {
-		t.Fatalf("Expected %x but got %x!", 5, regs[REG_B])
+	if regs[REG_B] != 0x405 {
+		t.Fatalf("Expected %x but got %x!", 0x405, regs[REG_B])
 	}
 }
 
@@ -237,8 +240,8 @@ func TestLrc(t *testing.T) {
 
 	Execute(regs, ec.Memory())
 
-	if regs[REG_C] != 5 {
-		t.Fatalf("Expected %x but got %x!", 5, regs[REG_C])
+	if regs[REG_C] != 0x405 {
+		t.Fatalf("Expected %x but got %x!", 0x405, regs[REG_C])
 	}
 }
 
@@ -295,8 +298,8 @@ func TestAdra(t *testing.T) {
 
 	Execute(regs, ec.Memory())
 
-	if regs[REG_A] != 7 {
-		t.Fatalf("Expected %x but got %x!", 7, regs[REG_A])
+	if regs[REG_A] != 0x407 {
+		t.Fatalf("Expected %x but got %x!", 0x407, regs[REG_A])
 	}
 }
 
@@ -315,8 +318,8 @@ func TestAdrb(t *testing.T) {
 
 	Execute(regs, ec.Memory())
 
-	if regs[REG_B] != 7 {
-		t.Fatalf("Expected %x but got %x!", 7, regs[REG_B])
+	if regs[REG_B] != 0x407 {
+		t.Fatalf("Expected %x but got %x!", 0x407, regs[REG_B])
 	}
 }
 
@@ -335,8 +338,8 @@ func TestAdrc(t *testing.T) {
 
 	Execute(regs, ec.Memory())
 
-	if regs[REG_C] != 7 {
-		t.Fatalf("Expected %x but got %x!", 7, regs[REG_C])
+	if regs[REG_C] != 0x407 {
+		t.Fatalf("Expected %x but got %x!", 0x407, regs[REG_C])
 	}
 }
 
@@ -359,5 +362,72 @@ func TestJmp(t *testing.T) {
 
 	if regs[REG_A] != 1 {
 		t.Fatalf("Expected %x but got %x!", 1, regs[REG_A])
+	}
+}
+
+func TestJnz(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewDefaultEmitContext()
+
+	asm.AsmLns(ec,
+		[]string{
+			".adrc test",
+			"ldca 0x01",
+			"jnz rc ra",
+			"ldcb 0x4321",
+			"hlt",
+			".l test",
+			"ldcb 0x1234",
+			"hlt",
+		})
+	ec.Resolve()
+	
+	Execute(regs, ec.Memory())
+
+	if regs[REG_B] != 0x1234 {
+		t.Fatalf("Expected %x but got %x!", 0x1234, regs[REG_B])
+	}
+}
+
+func TestJiz(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewDefaultEmitContext()
+
+	asm.AsmLns(ec,
+		[]string{
+			".adrc test",
+			"ldca 0x01",
+			"jiz rc ra",
+			"ldcb 0x4321",
+			"hlt",
+			".l test",
+			"ldcb 0x1234",
+			"hlt",
+		})
+	ec.Resolve()
+	
+	Execute(regs, ec.Memory())
+
+	if regs[REG_B] != 0x4321 {
+		t.Fatalf("Expected %x but got %x!", 0x4321, regs[REG_B])
+	}
+}
+
+func TestMov(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewDefaultEmitContext()
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldca 0x1234",
+			"mov re ra",
+			"hlt",
+		})
+	ec.Resolve()
+	
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 0x1234 {
+		t.Fatalf("Expected %x but got %x!", 0x1234, regs[REG_E])
 	}
 }

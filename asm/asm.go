@@ -29,8 +29,8 @@ type lateResolve struct {
 
 func NewDefaultEmitContext() *EmitContext {
 	return &EmitContext{
-		offset: 0,
-		memory: make([]uint8, 0x100),
+		offset: 1024,
+		memory: make([]uint8, 2048),
 		labels: make([]labelDef, 0),
 	}
 }
@@ -136,6 +136,8 @@ func Str2Op(i string) uint8 {
 		return OP_JNZ
 	case "fail":
 		return OP_FAIL
+	case "jiz":
+		return OP_JIZ
 	}
 
 	panic("no such op: " + i)

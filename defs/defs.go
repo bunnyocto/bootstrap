@@ -19,9 +19,15 @@ const OP_DIV = 0x07
 const OP_INC = 0x08
 const OP_DEC = 0x09
 const OP_MOV = 0x0A
+const OP_MOD = 0x0B
+const OP_SADD = 0x0C
+const OP_SSUB = 0x0D
+const OP_SMUL = 0x0E
+const OP_SDIV = 0x0F
 
 const OP_JMP = 0x30
 const OP_JNZ = 0x31
+const OP_JIZ = 0x32
 
 const OP_LDB = 0x40
 

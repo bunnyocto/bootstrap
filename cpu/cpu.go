@@ -4,7 +4,7 @@ import . "bootstrap/defs"
 import "fmt"
 
 func Execute(regs []uint32, memory []uint8) uint8 {
-	fmt.Printf("%X\n", memory)
+	regs[REG_IP] = 1024
 
 	for {
 		if regs[REG_IP] >= uint32(len(memory)) {
@@ -81,6 +81,10 @@ func Execute(regs []uint32, memory []uint8) uint8 {
 				regs[REG_IP] = regs[dst]
 			case OP_JNZ:
 				if regs[src] != 0 {
+					regs[REG_IP] = regs[dst]
+				}
+			case OP_JIZ:
+				if regs[src] == 0 {
 					regs[REG_IP] = regs[dst]
 				}
 			case OP_LDB:
