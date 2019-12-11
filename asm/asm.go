@@ -30,7 +30,7 @@ type lateResolve struct {
 func NewDefaultEmitContext() *EmitContext {
 	return &EmitContext{
 		offset: 1024,
-		memory: make([]uint8, 2048),
+		memory: make([]uint8, 4096),
 		labels: make([]labelDef, 0),
 	}
 }
@@ -95,9 +95,29 @@ func Str2Reg(i string) uint8 {
 		return REG_D
 	case "re":
 		return REG_E
+	case "rf":
+		return REG_F
+	case "rg":
+		return REG_G
+	case "rh":
+		return REG_H
+	case "ri":
+		return REG_I
+	case "rj":
+		return REG_J
+	case "rk":
+		return REG_K
+	case "rl": 
+		return REG_L
+	case "rm":
+		return REG_M
+	case "bp":
+		return REG_BP
+	case "sp":
+		return REG_SP
 	}
 
-	panic("no such reg")
+	panic("no such reg: " + i)
 }
 
 func Str2Op(i string) uint8 {
@@ -114,11 +134,11 @@ func Str2Op(i string) uint8 {
 		return OP_NOP
 	case "hlt":
 		return OP_HLT
-	case "ldcc":
+	case "ldcc","ldc.c":
 		return OP_LDCC
-	case "ldcb":
+	case "ldcb","ldc.b":
 		return OP_LDCB
-	case "ldca":
+	case "ldca","ldc.a":
 		return OP_LDCA
 	case "dec":
 		return OP_DEC
@@ -138,6 +158,14 @@ func Str2Op(i string) uint8 {
 		return OP_FAIL
 	case "jiz":
 		return OP_JIZ
+	case "pop":
+		return OP_POP
+	case "push":
+		return OP_PUSH
+	case "shl":
+		return OP_SHL
+	case "shr":
+		return OP_SHR
 	}
 
 	panic("no such op: " + i)
@@ -187,7 +215,7 @@ func Asm(ec *EmitContext, i string) {
 		case "nop","hlt","fail":
 			EmitOP(ec, Str2Op(flds[0]), 0, 0)
 		default:
-			panic("can't handle this")
+			panic("can't handle this: " + flds[0])
 		}
 	} else if len(flds) == 2 {
 		switch flds[0] {

@@ -428,6 +428,111 @@ func TestMov(t *testing.T) {
 	Execute(regs, ec.Memory())
 
 	if regs[REG_A] != 0x1234 {
-		t.Fatalf("Expected %x but got %x!", 0x1234, regs[REG_E])
+		t.Fatalf("Expected %x but got %x!", 0x1234, regs[REG_A])
+	}
+}
+
+func TestPush(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewDefaultEmitContext()
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldca 2048",
+			"ldcb 0x12345678",
+			"push ra rb",
+			"hlt",
+		})
+	ec.Resolve()
+	
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 2052 {
+		t.Fatalf("Expected %x but got %x!", 2052, regs[REG_A])
+	}
+	
+	if ec.Memory()[2048] != 0x12 {
+		t.Fatalf("Expected %x but got %x!", 0x12, ec.Memory()[2048])
+	}
+	
+	if ec.Memory()[2049] != 0x34 {
+		t.Fatalf("Expected %x but got %x!", 0x34, ec.Memory()[2049])
+	}
+	
+	if ec.Memory()[2050] != 0x56 {
+		t.Fatalf("Expected %x but got %x!", 0x56, ec.Memory()[2050])
+	}
+	
+	if ec.Memory()[2051] != 0x78 {
+		t.Fatalf("Expected %x but got %x!", 0x78, ec.Memory()[2051])
+	}
+}
+
+func TestPop(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewDefaultEmitContext()
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldca 2052",
+			"pop rb ra",
+			"hlt",
+		})
+	ec.Resolve()
+	
+	mem := ec.Memory()
+	mem[2051] = 0x78
+	mem[2050] = 0x56
+	mem[2049] = 0x34
+	mem[2048] = 0x12
+	
+	Execute(regs, ec.Memory())
+	
+	if regs[REG_A] != 2048 {
+		t.Fatalf("Expected %x but got %x!", 2048, regs[REG_A])
+	}
+	
+	if regs[REG_B] != 0x12345678 {
+		t.Fatalf("Expected %x but got %x!", 0x12345678, regs[REG_B])
+	}
+}
+
+func TestShl(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewDefaultEmitContext()
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldca 0x1234",
+			"ldcb 0x2",
+			"shl ra rb",
+			"hlt",
+		})
+	ec.Resolve()
+	
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 0x48d0 {
+		t.Fatalf("Expected %x but got %x!", 0x48d0, regs[REG_A])
+	}
+}
+
+func TestShr(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewDefaultEmitContext()
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldca 0x48d0",
+			"ldcb 0x2",
+			"shr ra rb",
+			"hlt",
+		})
+	ec.Resolve()
+	
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 0x1234 {
+		t.Fatalf("Expected %x but got %x!", 0x1234, regs[REG_A])
 	}
 }

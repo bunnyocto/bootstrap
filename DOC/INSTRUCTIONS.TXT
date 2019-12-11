@@ -1,0 +1,119 @@
+.:[ About ]:.
+
+This document specifies the instruction set. Arguments are provided surrounded by
+crocodile brackets `<>`. The format is `<name:type>`. Type `r` refers to a register.
+Type `32` refers to a 32bit constant value. 
+
+There are two possible instruction formats:
+
+Regular instructions:
+
+  +------------+---------+---------+
+  | OPCODE [8] | DST [4] | SRC [4] |
+  +------------+---------+---------+
+
+Constant loading instructions:
+
+  +--------+------------+------------+
+  | 000000 | OPCODE [2] | VALUE [32] |
+  +--------+------------+------------+
+
+.:[ Instructions ]:.
+
+LDCA
+	ldca <v:32>
+	00vvvvvvvv
+	
+	Desc.: Loads <v> into @ra.
+	
+LDCB
+	ldcb <v:32>
+	01vvvvvvvv
+	
+	Desc.: Loads <v> into @rb.
+
+LDCC
+	ldcc <v:32>
+	02vvvvvvvv
+	
+	Desc.: Loads <v> into @rc.
+	
+ADD
+	add <d:r> <s:r>
+	04ddddssss
+	
+	Desc.: Unsigned addtion. <d> += <s>. Wrap-around.
+	
+SUB
+	sub <d:r> <s:r>
+	05ddddssss
+	
+	Desc.: Unsigned addition. <d> -= <s>. Wrap-around.
+
+MUL
+	mul <d:r> <s:r>
+	06ddddssss
+	
+	Desc.: Unsigned multiplication. <d> *= <s>. Wrap-around.
+
+DIV
+	div <d:r> <s:r>
+	07ddddssss
+	
+	Desc.: Unsigned division. <d> /= <s>. Wrap-around. 
+	
+MOV
+	mov <d:r> <s:r>
+	08ddddssss
+	
+	Desc.: Copies the value from register <s> into register <d>. <d> := <s>.
+	
+	Faults:
+	 - If <d> is the IP register then the result is undefined. 
+	 - IF <s> is the IP register then the result is undefined.
+	
+MOD
+	mod <d:r> <s:r>
+	09ddddssss
+	
+	Desc.: Unsigned modulo operation. <d> %= <s>.
+	
+	Faults:
+	 - If <s> is zero then a ZeroFault is triggered. 
+	 
+SADD
+SSUB
+SMUL
+SDIV
+
+XCHG
+	xchg <d:r> <s:r>
+	10ddddssss
+	
+	Desc.: Swaps the values in registers <d> and <s>.
+
+JMP
+	jmp <t:r>
+	30tttt----
+	
+	Desc.: Jumps to the target address specified in <t>. ip := <t>.
+	
+JNZ
+	jnz <t:r> <q:r>
+	31ttttqqqq
+	
+	Desc.: Jumps to the target address specified in <t> if <q> is not zero.
+	
+	       IF <q> /= 0 THEN
+		       ip := <t>
+		   END
+		   
+JIZ
+	jiz <t:r> <q:r>
+	32ttttqqqq
+	
+	Desc.: Jumps to the target address specified in <t> if <q> is zero.
+	
+	       IF <q> == 0 THEN
+		       ip := <t>
+		   END

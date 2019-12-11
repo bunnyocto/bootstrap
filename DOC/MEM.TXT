@@ -1,0 +1,106 @@
+.:[ About ]:.
+
+This document specifies the memory layout. 
+
+.:[ Memory Layout ]:.
+
+  Addr    Desc
+  0-1023  Reserved
+  1024-x  Available
+  
+The first 1024 bytes contain information about the hardware and contain interrupt configuration
+etc.
+
+.[ Interrupt Routine Table ].
+
+The IRT is located at bytes 0-15. 
+
+  Addr    Desc
+  0       Target address for interrupt 0
+  4       Target address for interrupt 1
+  8       Target address for interrupt 2
+  12      Target address for interrupt 3
+  
+[ Syscall Address ]
+
+The SA is located at bytes 16-19. This is the target address for the syscall instruction.
+
+[ CPU Information ]
+
+Bytes 20-23 are CPU information. The format is:
+
+  +----------+------------------+--------+------------+
+  | TYPE [2] | MANUFACTURER [6] | ID [8] | FLAGS [16] |
+  +----------+------------------+--------+------------+
+  
+.: TYYE :.
+
+Gives some basic information about the type of CPU used. 
+
+  00 - Hardware CPU
+  01 - Soft CPU
+  10 - Virtual CPU (Emulated, VM)
+  11 - (reserved)
+  
+.: MANUFACTURER :.
+
+Specifies the manufacturer of the CPU. Please see `LSMANUFACTURERS.TXT`
+  
+.: ID :.
+
+The ID of the CPU. This identifies the model of the CPU. The ID b00000000 should be used for 
+work in progress or testing or similar. It should not be used for CPUs released for production use. 
+Please see `LSIDS.TXT`.
+
+.: FLAGS :.
+
+b0 refers to the left most bit. 
+
+  b0: This is always set to 1. 
+  
+[ Memory Size Information ]
+
+The MSI is located at bytes 24-27. It contains a UINT32 indicating the total amount of memory present. 
+
+[ Hardware Information Table ]
+
+The HIT is located at bytes 128-. It contants Hardware Information Records. 
+
+.: Hardware Information Record :.
+
+The format of an HIR is:
+
+  +-------+------------------+--------+----------+--------------+-----------+
+  | 1 [1] | MANUFACTURER [7] | ID [8] | TYPE [3] | PROTOCOL [5] | PORT [16] |
+  +-------+------------------+--------+----------+--------------+-----------+
+  
+The Hardware Information Records in memory are always next to each other. If the left most bit
+of a next potential HIR is not one then there are no more HIRs available. 
+  
+.. MANUFACTURER ..
+
+Manufacturer ID. See `LSMANUFACTURERS.TXT`.
+
+.. ID ..
+
+This identifies the model. See `LSHWIDS.TXT`. 
+
+.. TYPE ..
+
+Gives some rough information about what kind of hardware device this is. 
+
+  000 - Other
+  001 - Keyboard
+  010 - Mouse
+  011 - Audio Out
+  100 - Audio In
+  101 - Display
+  110 - Timer
+  
+.. PROTOCOL ..
+
+What protocol the hardware understands. See `LSPROTOCOLS.TXT`.
+
+.. PORT ..
+
+Under what port the device is accessible. 
