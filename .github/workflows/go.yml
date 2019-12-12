@@ -21,10 +21,10 @@ jobs:
         mkdir ./InT
         mkdir ./InT/src
         mkdir ./InT/src/bootstrap
-        mv -rf ./asm ./InT/src/bootstrap
-        mv -rf ./cpu ./InT/src/bootstrap
-        mv -rf ./integration_testing ./InT/src/bootstrap
-        mv -rf ./defs ./InT/src/bootstrap
+        mv -f ./asm ./InT/src/bootstrap
+        mv -f ./cpu ./InT/src/bootstrap
+        mv -f ./integration_testing ./InT/src/bootstrap
+        mv -f ./defs ./InT/src/bootstrap
         ls -lah ./InT/
         ls -lah ./InT/src
         ls -lah ./InT/src/bootstrap
