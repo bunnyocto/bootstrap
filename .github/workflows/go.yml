@@ -23,6 +23,8 @@ jobs:
 
     - name: InT
       run: |
-        cd ./bootstrap/integration_testing
+        echo $GOPATH
+        export GOPATH=/home/runner/work/bootstrap/
+        cd ./integration_testing
         ls -lah
         go test
