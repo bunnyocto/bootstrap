@@ -32,7 +32,7 @@ jobs:
     - name: InT
       run: |
         echo $GOPATH
-        export GOPATH=/home/runner/work/bootstrap/InT/
+        export GOPATH=/home/runner/work/bootstrap/bootstrap/InT/
         cd ./InT/src/bootstrap/integration_testing
         ls -lah
         go test
