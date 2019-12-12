@@ -16,15 +16,23 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v1
     
-    - name: ls
+    - name: Directory Layout
       run: |
-        pwd
-        ls -lah
+        mkdir ./InT
+        mkdir ./InT/src
+        mkdir ./InT/src/bootstrap
+        mv -rf ./asm ./InT/src/bootstrap
+        mv -rf ./cpu ./InT/src/bootstrap
+        mv -rf ./integration_testing ./InT/src/bootstrap
+        mv -rf ./defs ./InT/src/bootstrap
+        ls -lah ./InT/
+        ls -lah ./InT/src
+        ls -lah ./InT/src/bootstrap
 
     - name: InT
       run: |
         echo $GOPATH
-        export GOPATH=/home/runner/work/bootstrap/
-        cd ./integration_testing
+        export GOPATH=/home/runner/work/bootstrap/InT/
+        cd ./InT/src/bootstrap/integration_testing
         ls -lah
         go test
