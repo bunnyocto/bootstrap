@@ -28,11 +28,18 @@ jobs:
         ls -lah ./InT/
         ls -lah ./InT/src
         ls -lah ./InT/src/bootstrap
-
-    - name: InT
+        
+    - name: Regular Tests
       run: |
-        echo $GOPATH
+        export GOPATH=/home/runner/work/bootstrap/bootstrap/InT
+        cd ./InT/src/bootstrap/cpu
+        ls -lah
+        go test -test.v
+        
+
+    - name: Integration Tests
+      run: |
         export GOPATH=/home/runner/work/bootstrap/bootstrap/InT/
         cd ./InT/src/bootstrap/integration_testing
         ls -lah
-        go test
+        go test -test.v
