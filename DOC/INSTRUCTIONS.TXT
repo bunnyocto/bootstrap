@@ -91,6 +91,12 @@ XCHG
 	10ddddssss
 	
 	Desc.: Swaps the values in registers <d> and <s>.
+	
+BYT
+	byt <d:r>
+	13dddd----
+	
+	Desc.: Zeroes out all except the lowest byte. <d> &= 0xFF.
 
 JMP
 	jmp <t:r>
@@ -116,4 +122,15 @@ JIZ
 	
 	       IF <q> == 0 THEN
 		       ip := <t>
+		   END
+		   
+JNE
+	jne <a:r> <b:r>
+	35aaaabbbb
+	
+	Desc.: Jumps to the target address specified in register C if <a>
+	       is not equal to <b>. 
+		   
+		   IF <a> /= <b> THEN
+		       ip := C
 		   END

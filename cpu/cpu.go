@@ -1,6 +1,7 @@
 package cpu
 
 import . "bootstrap/defs"
+import asm "bootstrap/asm"
 import "fmt"
 
 func Execute(regs []uint32, memory []uint8) uint8 {
@@ -46,6 +47,8 @@ func Execute(regs []uint32, memory []uint8) uint8 {
 			regs[REG_IP]++
 
 			value := uint32(c0)<<24 | uint32(c1)<<16 | uint32(c2)<<8 | uint32(c3)
+			
+			fmt.Printf("[%08x] %02x%02x%02x%02x%02x ;%s %08x\n", regs[REG_IP]-5, i, c0, c1, c2, c3, asm.Op2Str(i), value)
 
 			switch i {
 			case OP_LDCA:
@@ -67,6 +70,10 @@ func Execute(regs []uint32, memory []uint8) uint8 {
 
 			src := b1 & 0x0F
 			dst := (b1 >> 4) & 0x0F
+			
+			fmt.Printf("[%08x] %02x%02x ; %s %s %s // %08x %08x\n", 
+				regs[REG_IP]-2, i, b1, asm.Op2Str(i), asm.Reg2Str(dst), asm.Reg2Str(src),
+				regs[dst], regs[src])
 
 			switch i {
 			case OP_NOP:
@@ -103,6 +110,7 @@ func Execute(regs []uint32, memory []uint8) uint8 {
 				}
 			case OP_LDB:
 				regs[dst] = uint32(memory[regs[src]])
+				fmt.Printf("// %02x\n", regs[dst])
 			case OP_STB:
 				memory[regs[dst]] = uint8(regs[src] & 0xFF)
 			case OP_MOV:
@@ -150,6 +158,12 @@ func Execute(regs []uint32, memory []uint8) uint8 {
 				regs[dst] <<= regs[src]
 			case OP_SHR:
 				regs[dst] >>= regs[src]
+			case OP_BYT:
+				regs[dst] = regs[dst] & 0xFF
+			case OP_JNE:
+				if regs[dst] != regs[src] {
+					regs[REG_IP] = regs[REG_C]
+				}
 			default:
 				return 1
 			}

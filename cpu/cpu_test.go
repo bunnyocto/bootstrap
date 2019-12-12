@@ -586,11 +586,16 @@ func TestRet(t *testing.T) {
 			"call rb ra",
 			"hlt",
 			".l func",
+			"inc rc",
 			"ret ra",
 		})
 	ec.Resolve()
 	
 	Execute(regs, ec.Memory())
+	
+	if regs[REG_C] != 1 {
+		t.Fatalf("Expected %x but got %x!", 1, regs[REG_C])
+	}
 
 	if regs[REG_A] != 2048 {
 		t.Fatalf("Expected %x but got %x!", 2052, regs[REG_A])

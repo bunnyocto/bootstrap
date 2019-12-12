@@ -96,6 +96,7 @@ Gives some rough information about what kind of hardware device this is.
   100 - Audio In
   101 - Display
   110 - Timer
+  111 - Storage
   
 .. PROTOCOL ..
 

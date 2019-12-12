@@ -36,12 +36,19 @@ const OP_SDIV = 0x0F
 const OP_XCHG = 0x10
 const OP_SHR = 0x11
 const OP_SHL = 0x12
+const OP_BYT = 0x13
 
 const OP_JMP = 0x30
 const OP_JNZ = 0x31
 const OP_JIZ = 0x32
 const OP_CALL = 0x33
 const OP_RET = 0x34
+const OP_JNE = 0x35
+const OP_JEQ = 0x36
+const OP_JLT = 0x37
+const OP_JGT = 0x38
+const OP_JBL = 0x39
+const OP_JAB = 0x3A
 
 const OP_LDB = 0x40
 const OP_STB = 0x41
