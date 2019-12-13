@@ -521,7 +521,7 @@ func Asm(ec *EmitContext, i string) error {
 
 			return EmitLDC(ec, op, uint32(val))
 		case "inc", "dec", "jmp", "ret", "byt":
-			op, err := Str2Op(flds[0])
+op, err := Str2Op(flds[0])
 
 			if err != nil {
 				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())

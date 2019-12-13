@@ -34,7 +34,6 @@ jobs:
         test -z $(gofmt -l ./InT/src/bootstrap/cpu)
         test -z $(gofmt -l ./InT/src/bootstrap/asm)
         test -z $(gofmt -l ./InT/src/bootstrap/defs)
-        test -z $(gofmt -l ./InT/src/bootstrap/emulathor)
         test -z $(gofmt -l ./InT/src/bootstrap/integration_testing)
         
     - name: Regular Tests
