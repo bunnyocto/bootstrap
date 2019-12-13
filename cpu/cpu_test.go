@@ -24,7 +24,7 @@ func emit_op(memory []uint8, op uint8, dst uint8, src uint8) []uint8 {
 
 func TestLdca(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -41,7 +41,7 @@ func TestLdca(t *testing.T) {
 
 func TestLdcb(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -58,7 +58,7 @@ func TestLdcb(t *testing.T) {
 
 func TestLdcc(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -75,7 +75,7 @@ func TestLdcc(t *testing.T) {
 
 func TestAdd(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -152,7 +152,7 @@ func TestDiv(t *testing.T) {
 
 func TestInc(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -171,7 +171,7 @@ func TestInc(t *testing.T) {
 
 func TestInc2(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -190,7 +190,7 @@ func TestInc2(t *testing.T) {
 
 func TestLra(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -209,7 +209,7 @@ func TestLra(t *testing.T) {
 
 func TestLrb(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -228,7 +228,7 @@ func TestLrb(t *testing.T) {
 
 func TestLrc(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -247,7 +247,7 @@ func TestLrc(t *testing.T) {
 
 func TestDec(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -266,7 +266,7 @@ func TestDec(t *testing.T) {
 
 func TestDec2(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -285,7 +285,7 @@ func TestDec2(t *testing.T) {
 
 func TestAdra(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -305,7 +305,7 @@ func TestAdra(t *testing.T) {
 
 func TestAdrb(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -325,7 +325,7 @@ func TestAdrb(t *testing.T) {
 
 func TestAdrc(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -345,7 +345,7 @@ func TestAdrc(t *testing.T) {
 
 func TestJmp(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -367,7 +367,7 @@ func TestJmp(t *testing.T) {
 
 func TestJnz(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -391,7 +391,7 @@ func TestJnz(t *testing.T) {
 
 func TestJiz(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -415,7 +415,7 @@ func TestJiz(t *testing.T) {
 
 func TestMov(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -434,7 +434,7 @@ func TestMov(t *testing.T) {
 
 func TestPush(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -470,7 +470,7 @@ func TestPush(t *testing.T) {
 
 func TestPop(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -499,7 +499,7 @@ func TestPop(t *testing.T) {
 
 func TestShl(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -519,7 +519,7 @@ func TestShl(t *testing.T) {
 
 func TestShr(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -539,7 +539,7 @@ func TestShr(t *testing.T) {
 
 func TestCall(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -577,7 +577,7 @@ func TestCall(t *testing.T) {
 
 func TestRet(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{

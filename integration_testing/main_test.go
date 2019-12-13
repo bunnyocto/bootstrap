@@ -37,7 +37,7 @@ func run(fpath string) {
 	}
 	
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 	asm.AsmReader(ec, f)
 	ec.Resolve()
 	

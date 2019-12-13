@@ -30,8 +30,16 @@ type lateResolve struct {
 
 func NewDefaultEmitContext() *EmitContext {
 	return &EmitContext{
-		offset: 1024,
-		memory: make([]uint8, 4096),
+		offset: 0,
+		memory: make([]uint8, 16),
+		labels: make([]labelDef, 0),
+	}
+}
+
+func NewEmitContext(offset int, memsz int) *EmitContext {
+	return &EmitContext {
+		offset: offset,
+		memory: make([]uint8, memsz),
 		labels: make([]labelDef, 0),
 	}
 }
@@ -70,6 +78,12 @@ func EmitBytes(ec *EmitContext, data []byte) {
 }
 
 func EmitLDC(ec *EmitContext, op uint8, val uint32) {
+	for ec.offset+4 >= len(ec.memory) {
+		new_mem := make([]uint8, len(ec.memory)+16)
+		copy(new_mem, ec.memory)
+		ec.memory = new_mem
+	}
+
 	ec.memory[ec.offset+0] = op
 	ec.memory[ec.offset+1] = uint8((val >> 24) & 0xFF)
 	ec.memory[ec.offset+2] = uint8((val >> 16) & 0xFF)
@@ -79,6 +93,12 @@ func EmitLDC(ec *EmitContext, op uint8, val uint32) {
 }
 
 func EmitOP(ec *EmitContext, op uint8, dst uint8, src uint8) {
+	for ec.offset+1 >= len(ec.memory) {
+		new_mem := make([]uint8, len(ec.memory)+16)
+		copy(new_mem, ec.memory)
+		ec.memory = new_mem
+	}
+
 	ec.memory[ec.offset+0] = op
 	ec.memory[ec.offset+1] = (dst << 4) | src
 	ec.offset += 2

@@ -2,12 +2,13 @@
 	jmp		ra
 
 %: \fn byteToHexCh
-%: \a0 Byte value to convert to hexadecimal representation
-%: \a1 Target address of the hexadecimal representation
+%: \a0:u32 Byte value to convert to hexadecimal representation
+%: \a1:ptr Target address of the hexadecimal representation
 %: \ds Converts the LSB of the argument 0 into a textual
 %: \ds hexadecimal representation which is stored in memory
 %: \ds at a location as specified per argument 1. Argument 1
 %: \ds must point to a buffer of at least size 2. 
+%: \rt:nil nothing
 .l byteToHexCh
 	push	ro	ra
 	push	ro	rb
