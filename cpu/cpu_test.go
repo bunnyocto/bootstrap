@@ -357,7 +357,7 @@ func TestJmp(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_A] != 1 {
@@ -381,7 +381,7 @@ func TestJnz(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_B] != 0x1234 {
@@ -405,7 +405,7 @@ func TestJiz(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_B] != 0x4321 {
@@ -424,7 +424,7 @@ func TestMov(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_A] != 0x1234 {
@@ -444,25 +444,25 @@ func TestPush(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_A] != 2052 {
 		t.Fatalf("Expected %x but got %x!", 2052, regs[REG_A])
 	}
-	
+
 	if ec.Memory()[2048] != 0x12 {
 		t.Fatalf("Expected %x but got %x!", 0x12, ec.Memory()[2048])
 	}
-	
+
 	if ec.Memory()[2049] != 0x34 {
 		t.Fatalf("Expected %x but got %x!", 0x34, ec.Memory()[2049])
 	}
-	
+
 	if ec.Memory()[2050] != 0x56 {
 		t.Fatalf("Expected %x but got %x!", 0x56, ec.Memory()[2050])
 	}
-	
+
 	if ec.Memory()[2051] != 0x78 {
 		t.Fatalf("Expected %x but got %x!", 0x78, ec.Memory()[2051])
 	}
@@ -479,19 +479,19 @@ func TestPop(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	mem := ec.Memory()
 	mem[2051] = 0x78
 	mem[2050] = 0x56
 	mem[2049] = 0x34
 	mem[2048] = 0x12
-	
+
 	Execute(regs, ec.Memory())
-	
+
 	if regs[REG_A] != 2048 {
 		t.Fatalf("Expected %x but got %x!", 2048, regs[REG_A])
 	}
-	
+
 	if regs[REG_B] != 0x12345678 {
 		t.Fatalf("Expected %x but got %x!", 0x12345678, regs[REG_B])
 	}
@@ -509,7 +509,7 @@ func TestShl(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_A] != 0x48d0 {
@@ -529,7 +529,7 @@ func TestShr(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_A] != 0x1234 {
@@ -551,25 +551,25 @@ func TestCall(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_A] != 2052 {
 		t.Fatalf("Expected %x but got %x!", 2052, regs[REG_A])
 	}
-	
+
 	if ec.Memory()[2048] != 0x00 {
 		t.Fatalf("Expected %x but got %x!", 0x00, ec.Memory()[2048])
 	}
-	
+
 	if ec.Memory()[2049] != 0x00 {
 		t.Fatalf("Expected %x but got %x!", 0x00, ec.Memory()[2049])
 	}
-	
+
 	if ec.Memory()[2050] != 0x04 {
 		t.Fatalf("Expected %x but got %x!", 0x04, ec.Memory()[2050])
 	}
-	
+
 	if ec.Memory()[2051] != 0x0C {
 		t.Fatalf("Expected %x but got %x!", 0x0C, ec.Memory()[2051])
 	}
@@ -590,9 +590,9 @@ func TestRet(t *testing.T) {
 			"ret ra",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
-	
+
 	if regs[REG_C] != 1 {
 		t.Fatalf("Expected %x but got %x!", 1, regs[REG_C])
 	}
@@ -600,7 +600,7 @@ func TestRet(t *testing.T) {
 	if regs[REG_A] != 2048 {
 		t.Fatalf("Expected %x but got %x!", 2052, regs[REG_A])
 	}
-	
+
 	if regs[REG_IP] != 1024+5+5+2+2 {
 		t.Fatalf("Terminated on wrong instruction!")
 	}

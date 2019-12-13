@@ -7,14 +7,15 @@ import "strconv"
 import "io"
 import "bufio"
 import "encoding/base64"
-
-//import "fmt"
+import "fmt"
 
 type EmitContext struct {
-	offset       int
-	memory       []uint8
-	labels       []labelDef
-	lateResolves []lateResolve
+	offset        int
+	memory        []uint8
+	labels        map[string]labelDef
+	lateResolves  []lateResolve
+	xLabels       map[string]labelDef
+	xLateResolves []lateResolve
 }
 
 type labelDef struct {
@@ -30,17 +31,19 @@ type lateResolve struct {
 
 func NewDefaultEmitContext() *EmitContext {
 	return &EmitContext{
-		offset: 0,
-		memory: make([]uint8, 16),
-		labels: make([]labelDef, 0),
+		offset:  0,
+		memory:  make([]uint8, 16),
+		labels:  make(map[string]labelDef),
+		xLabels: make(map[string]labelDef),
 	}
 }
 
 func NewEmitContext(offset int, memsz int) *EmitContext {
-	return &EmitContext {
-		offset: offset,
-		memory: make([]uint8, memsz),
-		labels: make([]labelDef, 0),
+	return &EmitContext{
+		offset:  offset,
+		memory:  make([]uint8, memsz),
+		labels:  make(map[string]labelDef),
+		xLabels: make(map[string]labelDef),
 	}
 }
 
@@ -50,34 +53,52 @@ func (ec *EmitContext) Memory() []uint8 {
 
 func (ec *EmitContext) Resolve() {
 	for _, lr := range ec.lateResolves {
-		found := false
-		for _, v := range ec.labels {
-			if v.name == lr.name {
-				found = true
-
-				ec.offset = lr.pos
-				EmitLDC(ec, lr.op, uint32(v.pos))
-
-				break
-			}
-		}
+		v, found := ec.labels[lr.name]
 
 		if !found {
 			panic("Label `" + lr.name + "` not found!")
 		}
+
+		ec.offset = lr.pos
+		EmitLDC(ec, lr.op, uint32(v.pos))
 	}
+
+	remXLateResolves := make([]lateResolve, 0)
+
+	for _, xlr := range ec.xLateResolves {
+		v, found := ec.xLabels[xlr.name]
+
+		if !found {
+			remXLateResolves = append(remXLateResolves, xlr)
+		}
+
+		ec.offset = xlr.pos
+		EmitLDC(ec, xlr.op, uint32(v.pos))
+	}
+
+	ec.lateResolves = make([]lateResolve, 0)
+	ec.labels = make(map[string]labelDef)
+	ec.xLateResolves = remXLateResolves
 }
 
-func EmitBytes(ec *EmitContext, data []byte) {
+func EmitBytes(ec *EmitContext, data []byte) error {
+	for ec.offset+len(data) >= len(ec.memory) {
+		new_mem := make([]uint8, len(ec.memory)+16)
+		copy(new_mem, ec.memory)
+		ec.memory = new_mem
+	}
+
 	jx := 0
 	for _, v := range data {
 		ec.memory[ec.offset+jx] = v
 		jx++
 	}
 	ec.offset += jx
+
+	return nil
 }
 
-func EmitLDC(ec *EmitContext, op uint8, val uint32) {
+func EmitLDC(ec *EmitContext, op uint8, val uint32) error {
 	for ec.offset+4 >= len(ec.memory) {
 		new_mem := make([]uint8, len(ec.memory)+16)
 		copy(new_mem, ec.memory)
@@ -90,9 +111,11 @@ func EmitLDC(ec *EmitContext, op uint8, val uint32) {
 	ec.memory[ec.offset+3] = uint8((val >> 8) & 0xFF)
 	ec.memory[ec.offset+4] = uint8(val & 0xFF)
 	ec.offset += 5
+
+	return nil
 }
 
-func EmitOP(ec *EmitContext, op uint8, dst uint8, src uint8) {
+func EmitOP(ec *EmitContext, op uint8, dst uint8, src uint8) error {
 	for ec.offset+1 >= len(ec.memory) {
 		new_mem := make([]uint8, len(ec.memory)+16)
 		copy(new_mem, ec.memory)
@@ -102,6 +125,8 @@ func EmitOP(ec *EmitContext, op uint8, dst uint8, src uint8) {
 	ec.memory[ec.offset+0] = op
 	ec.memory[ec.offset+1] = (dst << 4) | src
 	ec.offset += 2
+
+	return nil
 }
 
 func Op2Str(o uint8) string {
@@ -224,122 +249,134 @@ func Reg2Str(r uint8) string {
 	}
 }
 
-func Str2Reg(i string) uint8 {
+func Str2Reg(i string) (uint8, error) {
 	switch i {
 	case "ra", "A":
-		return REG_A
+		return REG_A, nil
 	case "rb", "B":
-		return REG_B
+		return REG_B, nil
 	case "rc", "C":
-		return REG_C
+		return REG_C, nil
 	case "rd", "D":
-		return REG_D
+		return REG_D, nil
 	case "re", "E":
-		return REG_E
+		return REG_E, nil
 	case "rf", "F":
-		return REG_F
+		return REG_F, nil
 	case "rg", "G":
-		return REG_G
+		return REG_G, nil
 	case "rh", "H":
-		return REG_H
+		return REG_H, nil
 	case "ri", "I":
-		return REG_I
+		return REG_I, nil
 	case "rj", "J":
-		return REG_J
+		return REG_J, nil
 	case "rk", "K":
-		return REG_K
+		return REG_K, nil
 	case "rl", "L":
-		return REG_L
+		return REG_L, nil
 	case "rm", "M":
-		return REG_M
+		return REG_M, nil
 	case "rn", "N":
-		return REG_N
+		return REG_N, nil
 	case "ro", "O":
-		return REG_O
+		return REG_O, nil
 	case "rip", "IP":
-		return REG_IP
+		return REG_IP, nil
 	}
 
-	panic("no such reg: " + i)
+	return 0, fmt.Errorf("Unknown register %q!", i)
 }
 
-func Str2Op(i string) uint8 {
+func Str2Op(i string) (uint8, error) {
 	switch i {
 	case "add":
-		return OP_ADD
+		return OP_ADD, nil
 	case "sub":
-		return OP_SUB
+		return OP_SUB, nil
 	case "div":
-		return OP_DIV
+		return OP_DIV, nil
 	case "mul":
-		return OP_MUL
+		return OP_MUL, nil
 	case "nop":
-		return OP_NOP
+		return OP_NOP, nil
 	case "hlt":
-		return OP_HLT
+		return OP_HLT, nil
 	case "ldcc", "ldc.c":
-		return OP_LDCC
+		return OP_LDCC, nil
 	case "ldcb", "ldc.b":
-		return OP_LDCB
+		return OP_LDCB, nil
 	case "ldca", "ldc.a":
-		return OP_LDCA
+		return OP_LDCA, nil
 	case "dec":
-		return OP_DEC
+		return OP_DEC, nil
 	case "inc":
-		return OP_INC
+		return OP_INC, nil
 	case "out":
-		return OP_OUT
+		return OP_OUT, nil
 	case "jmp":
-		return OP_JMP
+		return OP_JMP, nil
 	case "ldb":
-		return OP_LDB
+		return OP_LDB, nil
 	case "mov":
-		return OP_MOV
+		return OP_MOV, nil
 	case "jnz":
-		return OP_JNZ
+		return OP_JNZ, nil
 	case "fail":
-		return OP_FAIL
+		return OP_FAIL, nil
 	case "jiz":
-		return OP_JIZ
+		return OP_JIZ, nil
 	case "pop":
-		return OP_POP
+		return OP_POP, nil
 	case "push":
-		return OP_PUSH
+		return OP_PUSH, nil
 	case "shl":
-		return OP_SHL
+		return OP_SHL, nil
 	case "shr":
-		return OP_SHR
+		return OP_SHR, nil
 	case "stb":
-		return OP_STB
+		return OP_STB, nil
 	case "call":
-		return OP_CALL
+		return OP_CALL, nil
 	case "ret":
-		return OP_RET
+		return OP_RET, nil
 	case "byt":
-		return OP_BYT
+		return OP_BYT, nil
 	case "jne":
-		return OP_JNE
+		return OP_JNE, nil
 	}
 
-	panic("no such op: " + i)
+	return 0, fmt.Errorf("Unknown op %q!", i)
 }
 
-func AsmReader(ec *EmitContext, rd io.Reader) {
+func AsmReader(ec *EmitContext, rd io.Reader) error {
 	sc := bufio.NewScanner(rd)
 
 	for sc.Scan() {
 		ln := sc.Text()
-		Asm(ec, ln)
+		err := Asm(ec, ln)
+
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
-func AsmLns(ec *EmitContext, i []string) {
+func AsmLns(ec *EmitContext, i []string) error {
 	for _, v := range i {
-		Asm(ec, v)
+		err := Asm(ec, v)
+
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
-func Asm(ec *EmitContext, i string) {
+func Asm(ec *EmitContext, i string) error {
 	rawflds := strings.Fields(i)
 	flds := make([]string, 0)
 	for _, v := range rawflds {
@@ -351,24 +388,30 @@ func Asm(ec *EmitContext, i string) {
 	}
 
 	if len(flds) == 0 {
-		return
+		return nil
 	}
 
 	if len(flds) >= 1 {
 		switch flds[0] {
 		case ".c":
-			return
+			return nil
 		}
 	}
 
 	if len(flds) == 1 {
 		switch flds[0] {
 		case ".c":
-			return
+			return nil
 		case "nop", "hlt", "fail":
-			EmitOP(ec, Str2Op(flds[0]), 0, 0)
+			op, err := Str2Op(flds[0])
+
+			if err != nil {
+				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+			}
+
+			return EmitOP(ec, op, 0, 0)
 		default:
-			panic("can't handle this: " + flds[0])
+			return fmt.Errorf("Invalid line: %q! Unknown instruction or wrong number of arguments!", i)
 		}
 	} else if len(flds) == 2 {
 		switch flds[0] {
@@ -379,7 +422,29 @@ func Asm(ec *EmitContext, i string) {
 				name: name,
 				pos:  pos,
 			}
-			ec.labels = append(ec.labels, ld)
+
+			_, found := ec.labels[name]
+
+			if found {
+				return fmt.Errorf("Invalid line: %q! Duplicate label: %q!", i, name)
+			}
+
+			ec.labels[name] = ld
+		case ".x":
+			name := flds[1]
+			pos := ec.offset
+			ld := labelDef{
+				name: name,
+				pos:  pos,
+			}
+
+			_, found := ec.xLabels[name]
+
+			if found {
+				return fmt.Errorf("Invalid line: %q! Duplicate label: %q!", i, name)
+			}
+
+			ec.xLabels[name] = ld
 		case ".adra", ".adrb", ".adrc":
 			name := flds[1]
 			lr := lateResolve{
@@ -402,43 +467,97 @@ func Asm(ec *EmitContext, i string) {
 
 			ec.offset += 5
 
+		case ".xadra", ".xadrb", ".xadrc":
+			name := flds[1]
+			lr := lateResolve{
+				name: name,
+				pos:  ec.offset,
+			}
+
+			switch flds[0] {
+			case ".xadra":
+				lr.op = OP_LDCA
+			case ".xadrb":
+				lr.op = OP_LDCB
+			case ".xadrc":
+				lr.op = OP_LDCC
+			default:
+				panic("can't handle this")
+			}
+
+			ec.xLateResolves = append(ec.xLateResolves, lr)
+
+			ec.offset += 5
+
 		case ".lra", ".lrb", ".lrc":
 			name := flds[1]
-			found := false
-			for _, v := range ec.labels {
-				if v.name == name {
-					found = true
-					switch flds[0] {
-					case ".lra":
-						EmitLDC(ec, OP_LDCA, uint32(v.pos))
-					case ".lrb":
-						EmitLDC(ec, OP_LDCB, uint32(v.pos))
-					case ".lrc":
-						EmitLDC(ec, OP_LDCC, uint32(v.pos))
-					default:
-						panic("can't handle this")
-					}
-					break
-				}
-			}
+			v, found := ec.labels[name]
 
 			if !found {
-				panic("Label `" + name + "` not found!")
+				return fmt.Errorf("Invalid line: %q! Unknown label: %q!", i, name)
 			}
+
+			switch flds[0] {
+			case ".lra":
+				EmitLDC(ec, OP_LDCA, uint32(v.pos))
+			case ".lrb":
+				EmitLDC(ec, OP_LDCB, uint32(v.pos))
+			case ".lrc":
+				EmitLDC(ec, OP_LDCC, uint32(v.pos))
+			default:
+				panic("can't handle this")
+			}
+
 		case "strdata":
 			strval, _ := base64.StdEncoding.DecodeString(flds[1])
-			EmitBytes(ec, strval)
+			return EmitBytes(ec, strval)
 		case "ldca", "ldcb", "ldcc":
 			val, _ := strconv.ParseUint(flds[1], 0, 32)
-			EmitLDC(ec, Str2Op(flds[0]), uint32(val))
+			op, err := Str2Op(flds[0])
+
+			if err != nil {
+				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+			}
+
+			return EmitLDC(ec, op, uint32(val))
 		case "inc", "dec", "jmp", "ret", "byt":
-			EmitOP(ec, Str2Op(flds[0]), Str2Reg(flds[1]), 0)
+			op, err := Str2Op(flds[0])
+
+			if err != nil {
+				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+			}
+
+			reg, err := Str2Reg(flds[1])
+
+			if err != nil {
+				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+			}
+
+			return EmitOP(ec, op, reg, 0)
 		default:
-			panic("can't handle this: " + flds[0])
+			return fmt.Errorf("Invalid line: %q!", i)
 		}
 	} else if len(flds) == 3 {
-		EmitOP(ec, Str2Op(flds[0]), Str2Reg(flds[1]), Str2Reg(flds[2]))
+		op, err := Str2Op(flds[0])
+
+		if err != nil {
+			return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+		}
+
+		dst, err := Str2Reg(flds[1])
+
+		if err != nil {
+			return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+		}
+
+		src, err := Str2Reg(flds[2])
+
+		if err != nil {
+			return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+		}
+
+		return EmitOP(ec, op, dst, src)
 	}
 
-	return
+	return nil
 }
