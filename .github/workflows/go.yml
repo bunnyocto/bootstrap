@@ -29,6 +29,14 @@ jobs:
         ls -lah ./InT/src
         ls -lah ./InT/src/bootstrap
         
+    - name: Check fmt
+      run: |
+        test -z $(gofmt -l ./InT/src/bootstrap/cpu)
+        test -z $(gofmt -l ./InT/src/bootstrap/asm)
+        test -z $(gofmt -l ./InT/src/bootstrap/defs)
+        test -z $(gofmt -l ./InT/src/bootstrap/emulathor)
+        test -z $(gofmt -l ./InT/src/bootstrap/integration_testing)
+        
     - name: Regular Tests
       run: |
         export GOPATH=/home/runner/work/bootstrap/bootstrap/InT
