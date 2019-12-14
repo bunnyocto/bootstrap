@@ -21,7 +21,6 @@ jobs:
         mkdir ./InT
         mkdir ./InT/src
         mkdir ./InT/src/bootstrap
-        mkdir ./InT
         mv -f ./asm ./InT/src/bootstrap
         mv -f ./cpu ./InT/src/bootstrap
         mv -f ./integration_testing ./InT/src/bootstrap
