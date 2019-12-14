@@ -658,6 +658,42 @@ func TestJeq(t *testing.T) {
 	}
 }
 
+func TestLdp(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewEmitContext(1024, 4096)
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldp ra 0x5",
+			"hlt",
+		})
+	ec.Resolve()
+
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 0x05 {
+		t.Fatalf("Expected %x but got %x!", 0x05, regs[REG_A])
+	}
+}
+
+func TestLdn(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewEmitContext(1024, 4096)
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldn ra 0x5",
+			"hlt",
+		})
+	ec.Resolve()
+
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 0x80000005 {
+		t.Fatalf("Expected %x but got %x!", 0x80000005, regs[REG_A])
+	}
+}
+
 func TestByt(t *testing.T) {
 	regs := make([]uint32, 0x10)
 	ec := asm.NewEmitContext(1024, 4096)

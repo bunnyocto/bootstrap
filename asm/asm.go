@@ -217,6 +217,10 @@ func Op2Str(o uint8) string {
 		return "jne"
 	case OP_JEQ:
 		return "jeq"
+	case OP_LDN:
+		return "ldn"
+	case OP_LDP:
+		return "ldp"
 	default:
 		panic("can't handle this")
 	}
@@ -358,6 +362,10 @@ func Str2Op(i string) (uint8, error) {
 		return OP_JNE, nil
 	case "jeq":
 		return OP_JEQ, nil
+	case "ldp":
+		return OP_LDP, nil
+	case "ldn":
+		return OP_LDN, nil
 	}
 
 	return 0, fmt.Errorf("Unknown op %q!", i)
@@ -562,6 +570,13 @@ func Asm(ec *EmitContext, i string) error {
 
 		if err != nil {
 			return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+		}
+
+		switch op {
+		case OP_LDN, OP_LDP:
+			imm, _ := strconv.ParseUint(flds[2], 0, 4)
+
+			return EmitOP(ec, op, dst, uint8(imm))
 		}
 
 		src, err := Str2Reg(flds[2])
