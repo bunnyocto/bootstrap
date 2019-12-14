@@ -1,2 +1,2 @@
-.x stdlib_version
+.x std::version
 	strdata MDA=
