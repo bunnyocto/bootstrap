@@ -7,13 +7,13 @@ import "fmt"
 func Execute(regs []uint32, memory []uint8) uint8 {
 	// Fill in values
 	regs[REG_IP] = 1024
-	
+
 	// CPUID
-	memory[20] = uint8(0x2) << 2 | 0x000
+	memory[20] = uint8(0x2)<<2 | 0x000
 	memory[21] = 0x00
 	memory[22] = 0x10
 	memory[23] = 0x00
-	
+
 	//MSI
 	memsz := uint32(len(memory))
 	memory[24] = uint8((memsz >> 24) & 0xFF)
@@ -47,7 +47,7 @@ func Execute(regs []uint32, memory []uint8) uint8 {
 			regs[REG_IP]++
 
 			value := uint32(c0)<<24 | uint32(c1)<<16 | uint32(c2)<<8 | uint32(c3)
-			
+
 			fmt.Printf("[%08x] %02x%02x%02x%02x%02x ;%s %08x\n", regs[REG_IP]-5, i, c0, c1, c2, c3, asm.Op2Str(i), value)
 
 			switch i {
@@ -70,8 +70,8 @@ func Execute(regs []uint32, memory []uint8) uint8 {
 
 			src := b1 & 0x0F
 			dst := (b1 >> 4) & 0x0F
-			
-			fmt.Printf("[%08x] %02x%02x ; %s %s %s // %08x %08x\n", 
+
+			fmt.Printf("[%08x] %02x%02x ; %s %s %s // %08x %08x\n",
 				regs[REG_IP]-2, i, b1, asm.Op2Str(i), asm.Reg2Str(dst), asm.Reg2Str(src),
 				regs[dst], regs[src])
 
@@ -122,13 +122,13 @@ func Execute(regs []uint32, memory []uint8) uint8 {
 			case OP_CALL:
 				b0 := uint8((regs[REG_IP] >> 24) & 0xFF)
 				b1 := uint8((regs[REG_IP] >> 16) & 0xFF)
-				b2 := uint8((regs[REG_IP] >>  8) & 0xFF)
-				b3 := uint8((regs[REG_IP] >>  0) & 0xFF)
+				b2 := uint8((regs[REG_IP] >> 8) & 0xFF)
+				b3 := uint8((regs[REG_IP] >> 0) & 0xFF)
 				memory[regs[src]+0] = b0
 				memory[regs[src]+1] = b1
 				memory[regs[src]+2] = b2
 				memory[regs[src]+3] = b3
-				regs[src]+=4
+				regs[src] += 4
 				regs[REG_IP] = regs[dst]
 			case OP_RET:
 				regs[dst] -= 4
@@ -136,12 +136,12 @@ func Execute(regs []uint32, memory []uint8) uint8 {
 				b1 := memory[regs[dst]+1]
 				b2 := memory[regs[dst]+2]
 				b3 := memory[regs[dst]+3]
-				regs[REG_IP] = uint32(b0) << 24 | uint32(b1) << 16 | uint32(b2) << 8 | uint32(b3)
+				regs[REG_IP] = uint32(b0)<<24 | uint32(b1)<<16 | uint32(b2)<<8 | uint32(b3)
 			case OP_PUSH:
 				b0 := uint8((regs[src] >> 24) & 0xFF)
 				b1 := uint8((regs[src] >> 16) & 0xFF)
-				b2 := uint8((regs[src] >>  8) & 0xFF)
-				b3 := uint8((regs[src] >>  0) & 0xFF)
+				b2 := uint8((regs[src] >> 8) & 0xFF)
+				b3 := uint8((regs[src] >> 0) & 0xFF)
 				memory[regs[dst]+0] = b0
 				memory[regs[dst]+1] = b1
 				memory[regs[dst]+2] = b2
@@ -153,7 +153,7 @@ func Execute(regs []uint32, memory []uint8) uint8 {
 				b1 := memory[regs[src]+1]
 				b2 := memory[regs[src]+2]
 				b3 := memory[regs[src]+3]
-				regs[dst] = uint32(b0) << 24 | uint32(b1) << 16 | uint32(b2) << 8 | uint32(b3)
+				regs[dst] = uint32(b0)<<24 | uint32(b1)<<16 | uint32(b2)<<8 | uint32(b3)
 			case OP_SHL:
 				regs[dst] <<= regs[src]
 			case OP_SHR:
@@ -164,6 +164,14 @@ func Execute(regs []uint32, memory []uint8) uint8 {
 				if regs[dst] != regs[src] {
 					regs[REG_IP] = regs[REG_C]
 				}
+			case OP_JEQ:
+				if regs[dst] == regs[src] {
+					regs[REG_IP] = regs[REG_C]
+				}
+			case OP_LDP:
+				regs[dst] = uint32(src)
+			case OP_LDN:
+				regs[dst] = uint32(src) | 0x80000000
 			default:
 				return 1
 			}
