@@ -63,5 +63,5 @@ jobs:
         go build
         
     - name: Build sw/asm
-        run: |
-          ./InT/src/bootstrap/cmd/basm/basm -module=stdlib.M -paths=./InT/sw/asm
+      run: |
+        ./InT/src/bootstrap/cmd/basm/basm -module=stdlib.M -paths=./InT/sw/asm
