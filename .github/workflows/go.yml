@@ -25,6 +25,7 @@ jobs:
         mv -f ./cpu ./InT/src/bootstrap
         mv -f ./integration_testing ./InT/src/bootstrap
         mv -f ./defs ./InT/src/bootstrap
+        mv -f ./cmd ./InT/src/bootstrap
         ls -lah ./InT/
         ls -lah ./InT/src
         ls -lah ./InT/src/bootstrap
@@ -35,6 +36,7 @@ jobs:
         test -z $(gofmt -l ./InT/src/bootstrap/asm)
         test -z $(gofmt -l ./InT/src/bootstrap/defs)
         test -z $(gofmt -l ./InT/src/bootstrap/integration_testing)
+        test -z $(gofmt -l ./InT/src/bootstrap/cmd/basm)
         
     - name: Regular Tests
       run: |
@@ -50,3 +52,9 @@ jobs:
         cd ./InT/src/bootstrap/integration_testing
         ls -lah
         go test -test.v
+
+    - name: Build cmds
+      run: |
+        export GOPATH=/home/runner/work/bootstrap/bootstrap/InT/
+        cd ./InT/src/bootstrap/cmd/basm
+        go build
