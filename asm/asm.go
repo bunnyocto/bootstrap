@@ -81,6 +81,16 @@ func (ec *EmitContext) Resolve() {
 	ec.xLateResolves = remXLateResolves
 }
 
+func (ec *EmitContext) GetXUnresolved() []string {
+	strs := make([]string, 0)
+
+	for _, xlr := range ec.xLateResolves {
+		strs = append(strs, xlr.name)
+	}
+
+	return strs
+}
+
 func EmitBytes(ec *EmitContext, data []byte) error {
 	for ec.offset+len(data) >= len(ec.memory) {
 		new_mem := make([]uint8, len(ec.memory)+16)
