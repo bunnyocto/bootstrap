@@ -134,3 +134,15 @@ JNE
 		   IF <a> /= <b> THEN
 		       ip := C
 		   END
+		   
+LDP
+	ldp	<d:r> <v:4>
+	e0ddddvvvv
+	
+	Desc.: Loads positive 4 bits constant into register <d>. <d> := <v>
+	
+LDN
+	ldn <d:r> <v:4>
+	e1ddddvvvv
+	
+	Desc.: Loads negative 4 bits constant into register <d>. <d> := -<v>

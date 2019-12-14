@@ -24,7 +24,7 @@ func emit_op(memory []uint8, op uint8, dst uint8, src uint8) []uint8 {
 
 func TestLdca(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -41,7 +41,7 @@ func TestLdca(t *testing.T) {
 
 func TestLdcb(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -58,7 +58,7 @@ func TestLdcb(t *testing.T) {
 
 func TestLdcc(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -75,7 +75,7 @@ func TestLdcc(t *testing.T) {
 
 func TestAdd(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -152,7 +152,7 @@ func TestDiv(t *testing.T) {
 
 func TestInc(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -171,7 +171,7 @@ func TestInc(t *testing.T) {
 
 func TestInc2(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -190,7 +190,7 @@ func TestInc2(t *testing.T) {
 
 func TestLra(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -209,7 +209,7 @@ func TestLra(t *testing.T) {
 
 func TestLrb(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -228,7 +228,7 @@ func TestLrb(t *testing.T) {
 
 func TestLrc(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -247,7 +247,7 @@ func TestLrc(t *testing.T) {
 
 func TestDec(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -266,7 +266,7 @@ func TestDec(t *testing.T) {
 
 func TestDec2(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -285,7 +285,7 @@ func TestDec2(t *testing.T) {
 
 func TestAdra(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -305,7 +305,7 @@ func TestAdra(t *testing.T) {
 
 func TestAdrb(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -325,7 +325,7 @@ func TestAdrb(t *testing.T) {
 
 func TestAdrc(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -345,7 +345,7 @@ func TestAdrc(t *testing.T) {
 
 func TestJmp(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -357,7 +357,7 @@ func TestJmp(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_A] != 1 {
@@ -367,7 +367,7 @@ func TestJmp(t *testing.T) {
 
 func TestJnz(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -381,7 +381,7 @@ func TestJnz(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_B] != 0x1234 {
@@ -391,7 +391,7 @@ func TestJnz(t *testing.T) {
 
 func TestJiz(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -405,7 +405,7 @@ func TestJiz(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_B] != 0x4321 {
@@ -415,7 +415,7 @@ func TestJiz(t *testing.T) {
 
 func TestMov(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -424,7 +424,7 @@ func TestMov(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_A] != 0x1234 {
@@ -434,7 +434,7 @@ func TestMov(t *testing.T) {
 
 func TestPush(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -444,25 +444,25 @@ func TestPush(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_A] != 2052 {
 		t.Fatalf("Expected %x but got %x!", 2052, regs[REG_A])
 	}
-	
+
 	if ec.Memory()[2048] != 0x12 {
 		t.Fatalf("Expected %x but got %x!", 0x12, ec.Memory()[2048])
 	}
-	
+
 	if ec.Memory()[2049] != 0x34 {
 		t.Fatalf("Expected %x but got %x!", 0x34, ec.Memory()[2049])
 	}
-	
+
 	if ec.Memory()[2050] != 0x56 {
 		t.Fatalf("Expected %x but got %x!", 0x56, ec.Memory()[2050])
 	}
-	
+
 	if ec.Memory()[2051] != 0x78 {
 		t.Fatalf("Expected %x but got %x!", 0x78, ec.Memory()[2051])
 	}
@@ -470,7 +470,7 @@ func TestPush(t *testing.T) {
 
 func TestPop(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -479,19 +479,19 @@ func TestPop(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	mem := ec.Memory()
 	mem[2051] = 0x78
 	mem[2050] = 0x56
 	mem[2049] = 0x34
 	mem[2048] = 0x12
-	
+
 	Execute(regs, ec.Memory())
-	
+
 	if regs[REG_A] != 2048 {
 		t.Fatalf("Expected %x but got %x!", 2048, regs[REG_A])
 	}
-	
+
 	if regs[REG_B] != 0x12345678 {
 		t.Fatalf("Expected %x but got %x!", 0x12345678, regs[REG_B])
 	}
@@ -499,7 +499,7 @@ func TestPop(t *testing.T) {
 
 func TestShl(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -509,7 +509,7 @@ func TestShl(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_A] != 0x48d0 {
@@ -519,7 +519,7 @@ func TestShl(t *testing.T) {
 
 func TestShr(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -529,7 +529,7 @@ func TestShr(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_A] != 0x1234 {
@@ -539,7 +539,7 @@ func TestShr(t *testing.T) {
 
 func TestCall(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -551,25 +551,25 @@ func TestCall(t *testing.T) {
 			"hlt",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
 
 	if regs[REG_A] != 2052 {
 		t.Fatalf("Expected %x but got %x!", 2052, regs[REG_A])
 	}
-	
+
 	if ec.Memory()[2048] != 0x00 {
 		t.Fatalf("Expected %x but got %x!", 0x00, ec.Memory()[2048])
 	}
-	
+
 	if ec.Memory()[2049] != 0x00 {
 		t.Fatalf("Expected %x but got %x!", 0x00, ec.Memory()[2049])
 	}
-	
+
 	if ec.Memory()[2050] != 0x04 {
 		t.Fatalf("Expected %x but got %x!", 0x04, ec.Memory()[2050])
 	}
-	
+
 	if ec.Memory()[2051] != 0x0C {
 		t.Fatalf("Expected %x but got %x!", 0x0C, ec.Memory()[2051])
 	}
@@ -577,7 +577,7 @@ func TestCall(t *testing.T) {
 
 func TestRet(t *testing.T) {
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
+	ec := asm.NewEmitContext(1024, 4096)
 
 	asm.AsmLns(ec,
 		[]string{
@@ -590,9 +590,9 @@ func TestRet(t *testing.T) {
 			"ret ra",
 		})
 	ec.Resolve()
-	
+
 	Execute(regs, ec.Memory())
-	
+
 	if regs[REG_C] != 1 {
 		t.Fatalf("Expected %x but got %x!", 1, regs[REG_C])
 	}
@@ -600,8 +600,115 @@ func TestRet(t *testing.T) {
 	if regs[REG_A] != 2048 {
 		t.Fatalf("Expected %x but got %x!", 2052, regs[REG_A])
 	}
-	
+
 	if regs[REG_IP] != 1024+5+5+2+2 {
 		t.Fatalf("Terminated on wrong instruction!")
+	}
+}
+
+func TestJne(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewEmitContext(1024, 4096)
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldca 0x11223344",
+			"ldcb 0x44332211",
+			".adrc ne",
+			"jne ra rb",
+			".l eq",
+			"ldca 0x01",
+			"hlt",
+			".l ne",
+			"ldca 0x02",
+			"hlt",
+		})
+	ec.Resolve()
+
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 0x02 {
+		t.Fatalf("Expected %x but got %x!", 0x02, regs[REG_A])
+	}
+}
+
+func TestJeq(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewEmitContext(1024, 4096)
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldca 0x11223344",
+			"ldcb 0x44332211",
+			".adrc ne",
+			"jeq ra rb",
+			".l ne",
+			"ldca 0x01",
+			"hlt",
+			".l eq",
+			"ldca 0x02",
+			"hlt",
+		})
+	ec.Resolve()
+
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 0x01 {
+		t.Fatalf("Expected %x but got %x!", 0x01, regs[REG_A])
+	}
+}
+
+func TestLdp(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewEmitContext(1024, 4096)
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldp ra 0x5",
+			"hlt",
+		})
+	ec.Resolve()
+
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 0x05 {
+		t.Fatalf("Expected %x but got %x!", 0x05, regs[REG_A])
+	}
+}
+
+func TestLdn(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewEmitContext(1024, 4096)
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldn ra 0x5",
+			"hlt",
+		})
+	ec.Resolve()
+
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 0x80000005 {
+		t.Fatalf("Expected %x but got %x!", 0x80000005, regs[REG_A])
+	}
+}
+
+func TestByt(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewEmitContext(1024, 4096)
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldca 0x48d0",
+			"byt ra",
+			"hlt",
+		})
+	ec.Resolve()
+
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 0xd0 {
+		t.Fatalf("Expected %x but got %x!", 0xd0, regs[REG_A])
 	}
 }

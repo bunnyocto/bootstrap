@@ -59,6 +59,9 @@ const OP_STW = 0x45
 const OP_PUSH = 0x46
 const OP_POP = 0x47
 
+const OP_LDP = 0xE0
+const OP_LDN = 0xE1
+
 const OP_FAIL = 0xFC
 const OP_OUT = 0xFD
 const OP_HLT = 0xFE
