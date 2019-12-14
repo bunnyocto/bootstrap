@@ -215,6 +215,8 @@ func Op2Str(o uint8) string {
 		return "byt"
 	case OP_JNE:
 		return "jne"
+	case OP_JEQ:
+		return "jeq"
 	default:
 		panic("can't handle this")
 	}
@@ -354,6 +356,8 @@ func Str2Op(i string) (uint8, error) {
 		return OP_BYT, nil
 	case "jne":
 		return OP_JNE, nil
+	case "jeq":
+		return OP_JEQ, nil
 	}
 
 	return 0, fmt.Errorf("Unknown op %q!", i)

@@ -606,6 +606,58 @@ func TestRet(t *testing.T) {
 	}
 }
 
+func TestJne(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewEmitContext(1024, 4096)
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldca 0x11223344",
+			"ldcb 0x44332211",
+			".adrc ne",
+			"jne ra rb",
+			".l eq",
+			"ldca 0x01",
+			"hlt",
+			".l ne",
+			"ldca 0x02",
+			"hlt",
+		})
+	ec.Resolve()
+
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 0x02 {
+		t.Fatalf("Expected %x but got %x!", 0x02, regs[REG_A])
+	}
+}
+
+func TestJeq(t *testing.T) {
+	regs := make([]uint32, 0x10)
+	ec := asm.NewEmitContext(1024, 4096)
+
+	asm.AsmLns(ec,
+		[]string{
+			"ldca 0x11223344",
+			"ldcb 0x44332211",
+			".adrc ne",
+			"jeq ra rb",
+			".l ne",
+			"ldca 0x01",
+			"hlt",
+			".l eq",
+			"ldca 0x02",
+			"hlt",
+		})
+	ec.Resolve()
+
+	Execute(regs, ec.Memory())
+
+	if regs[REG_A] != 0x01 {
+		t.Fatalf("Expected %x but got %x!", 0x01, regs[REG_A])
+	}
+}
+
 func TestByt(t *testing.T) {
 	regs := make([]uint32, 0x10)
 	ec := asm.NewEmitContext(1024, 4096)

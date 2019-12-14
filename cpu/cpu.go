@@ -164,6 +164,10 @@ func Execute(regs []uint32, memory []uint8) uint8 {
 				if regs[dst] != regs[src] {
 					regs[REG_IP] = regs[REG_C]
 				}
+			case OP_JEQ:
+				if regs[dst] == regs[src] {
+					regs[REG_IP] = regs[REG_C]
+				}
 			default:
 				return 1
 			}
