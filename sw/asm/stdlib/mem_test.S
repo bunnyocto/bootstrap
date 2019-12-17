@@ -26,8 +26,7 @@
 	call	rc	ro
 	.adrc	std::test::memcpy_mismatch
 	
-	jnz		rc	rn
-	nop
+	jiz		rc	rn
 	
 	pop		ro	ra
 	pop		ro	rb
