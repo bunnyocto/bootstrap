@@ -7,8 +7,8 @@
 %:      regions must not overlap.
 %: RET  Nothing
 .x std::memcpy
-	push	ro	rc
-	push	ro	rb
+	.save	rc
+	.save	rb
 	
 	.adrc	std::memcpy_loop_end
 	.adrb	std::memcpy_loop
@@ -24,9 +24,9 @@
 	jmp		rb
 
 .l std::memcpy_loop_end
-	pop		rb	ro
-	pop		rc	ro
-	ret		ro
+	.ret
+	
+.eof
 
 %: NAME std::memcmp
 %: ARGS
@@ -37,8 +37,8 @@
 %:      The regions must not overlap. 
 %: RET 0 if regions are not equal, otherwise `memcmp` returns 1.
 .x std::memcmp
-	push	ro	rc
-	push	ro	rd
+	.save	rc
+	.save	rd
 	
 	.adrc	std::memcmp_loop_end
 	mov		rd	rc
@@ -59,13 +59,11 @@
 	jmp		rb
 
 .l std::memcmp_loop_end
-	pop		rd	ro
-	pop		rc	ro
 	ldp		rn	1
-	ret		ro
+	.ret
 	
 .l std::memcmp_loop_end_false
-	pop		rd	ro
-	pop		rc	ro
 	ldp		rn	0
-	ret		ro
+	.ret
+	
+.eof

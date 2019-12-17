@@ -6,7 +6,7 @@
 	strdata MTIzNDU=
 	
 .x std::test::memcmp
-	push	ro	rc
+	.save	rc
 	
 	.adrc	std::test::memcmp_buf1
 	mov		re	rc
@@ -34,8 +34,9 @@
 	call	rh	ro
 	jnz		rc	rn
 	
-	pop		rc	ro
-	ret		ro
+	.ret
+	
+.eof
 	
 .l std::test::memcmp_fail
 	fail
@@ -46,9 +47,9 @@
 	strdata MDAwMDA=
 	
 .x std::test::memcpy
-	push	ro	rc
-	push	ro	rb
-	push	ro	ra
+	.save	rc
+	.save	rb
+	.save	ra
 
 	.adra	std::test::memcpy_cpybuf
 	.adrb	std::test::memcpy_origbuf
@@ -58,22 +59,21 @@
 	ldp		rk	5
 	
 	.xadrc	std::memcpy
-	call	rc	ro
+	.call	rc
 	
 	mov		ri	ra
 	mov		rj	rb
 	ldp		rk	5
 
 	.xadrc	std::memcmp
-	call	rc	ro
+	.call	rc
 	.adrc	std::test::memcpy_mismatch
 	
 	jiz		rc	rn
 	
-	pop		ra	ro
-	pop		rb	ro
-	pop		rc	ro
-	ret		ro
+	.ret
 	
 .l std::test::memcpy_mismatch
 	fail
+	
+.eof

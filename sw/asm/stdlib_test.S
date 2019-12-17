@@ -4,10 +4,10 @@
 	
 .l std::test::run_tests
 	.xadrc	std::test::memcpy
-	call	rc	ro
+	.call	rc
 	
 	.xadrc	std::test::memcmp
-	call	rc	ro
+	.call	rc
 	
 .l std::test::run_tests_end
 	hlt

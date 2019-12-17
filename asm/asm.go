@@ -17,6 +17,7 @@ type EmitContext struct {
 	xLabels       map[string]labelDef
 	xLateResolves []lateResolve
 	origin        int
+	saves         []uint8
 }
 
 type labelDef struct {
@@ -429,6 +430,19 @@ func Asm(ec *EmitContext, i string) error {
 
 	if len(flds) == 1 {
 		switch flds[0] {
+		case ".eof":
+			ec.saves = nil
+		case ".ret":
+			fmt.Println("LEN: %d", len(ec.saves))
+			for i := len(ec.saves) - 1; i >= 0; i-- {
+				err := EmitOP(ec, OP_POP, ec.saves[i], REG_O)
+
+				if err != nil {
+					return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+				}
+			}
+
+			return EmitOP(ec, OP_RET, REG_O, 0)
 		case ".c":
 			return nil
 		case "nop", "hlt", "fail":
@@ -444,6 +458,24 @@ func Asm(ec *EmitContext, i string) error {
 		}
 	} else if len(flds) == 2 {
 		switch flds[0] {
+		case ".save":
+			r, err := Str2Reg(flds[1])
+
+			if err != nil {
+				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+			}
+
+			ec.saves = append(ec.saves, r)
+
+			return EmitOP(ec, OP_PUSH, REG_O, r)
+		case ".call":
+			r, err := Str2Reg(flds[1])
+
+			if err != nil {
+				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+			}
+
+			return EmitOP(ec, OP_CALL, r, REG_O)
 		case ".origin":
 			v, _ := strconv.ParseInt(flds[1], 0, 32)
 
