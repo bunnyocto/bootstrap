@@ -448,6 +448,9 @@ func Asm(ec *EmitContext, i string) error {
 			v, _ := strconv.ParseInt(flds[1], 0, 32)
 
 			ec.origin = int(v)
+		case ".alloc":
+			v, _ := strconv.ParseInt(flds[1], 0, 32)
+			ec.offset += int(v)
 		case ".l":
 			name := flds[1]
 			pos := ec.offset

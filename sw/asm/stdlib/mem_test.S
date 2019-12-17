@@ -24,11 +24,13 @@
 	
 	mov		ri	re
 	mov		rj	rf
+	ldp		rk	5
 	call	rh	ro
 	jiz		rc	rn
 	
 	mov		ri	re
 	mov		rj	rg
+	ldp		rk	5
 	call	rh	ro
 	jnz		rc	rn
 	
@@ -68,9 +70,9 @@
 	
 	jiz		rc	rn
 	
-	pop		ro	ra
-	pop		ro	rb
-	pop		ro	rc
+	pop		ra	ro
+	pop		rb	ro
+	pop		rc	ro
 	ret		ro
 	
 .l std::test::memcpy_mismatch

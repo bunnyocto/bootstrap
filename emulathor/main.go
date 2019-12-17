@@ -20,14 +20,14 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	
+
 	fileContents, err := ioutil.ReadAll(f)
-	
+
 	if err != nil {
 		panic(err.Error())
 	}
-	
-	memory := make([]uint8, 1024 + len(fileContents))
+
+	memory := make([]uint8, 1024+len(fileContents))
 	copy(memory[1024:], fileContents)
 
 	regs := make([]uint32, 0x10)
@@ -36,6 +36,6 @@ func main() {
 		fmt.Printf("Error on execute!")
 		os.Exit(1)
 	}
-	
+
 	os.Exit(0)
 }

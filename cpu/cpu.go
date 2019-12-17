@@ -62,6 +62,7 @@ func Execute(regs []uint32, memory []uint8) uint8 {
 			}
 		} else {
 			if regs[REG_IP] >= uint32(len(memory)) {
+				fmt.Printf("[%08x] !eof!\n", regs[REG_IP])
 				return 2
 			}
 
