@@ -1,3 +1,43 @@
+.l std::test::memset_buf1
+	strdata YWJjZGU=
+.l std::test::memset_buf2
+	strdata MDAwMDA=
+	
+.x std::test::memset
+	.save	rc
+	
+	.adrc	std::test::memset_buf1
+	mov		ri	rc
+	
+	ldcc	0x30
+	mov		rj	rc
+	
+	ldp		rk	5
+	
+	.xadrc	std::memset
+	.call	rc
+	
+	.adrc	std::test::memset_buf1
+	mov		ri	rc
+	
+	.adrc	std::test::memset_buf2
+	mov		rj	rc
+	
+	ldp		rk	5
+	
+	.xadrc	std::memcmp
+	.call	rc
+	
+	.adrc	std::test::memset_fail
+	jiz		rc	rn
+	
+	.ret
+	
+.l	std::test::memset_fail
+	fail
+	
+.eof
+
 .l std::test::memcmp_buf1
 	strdata YWJjZGU=
 .l std::test::memcmp_buf2

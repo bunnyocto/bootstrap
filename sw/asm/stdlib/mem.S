@@ -1,3 +1,27 @@
+%: NAME std::memset
+%: ARGS
+%:  ri	Region
+%:  rj  Val
+%:  rk  N
+%: DESC Overwrites N bytes in Region with Val.
+%: RET	Nothing
+.x std::memset
+	.var	Region	ri
+	.var	Val		rj
+	.var	N		rk
+	
+	.save	rc
+	
+	.whilenz N
+		stb		Region	Val
+		inc		Region
+		dec		N
+	.end
+	
+	.ret
+	
+.eof
+
 %: NAME std::memcpy
 %: ARGS
 %:  ri  Destination

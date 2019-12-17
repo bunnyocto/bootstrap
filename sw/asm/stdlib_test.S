@@ -6,9 +6,8 @@
 	
 .l std::test::run_tests
 .m	xcallc	std::test::memcpy
-	
-	.xadrc	std::test::memcmp
-	.call	rc
+.m	xcallc	std::test::memcmp
+.m	xcallc	std::test::memset
 	
 .l std::test::run_tests_end
 	hlt
