@@ -16,6 +16,7 @@ type EmitContext struct {
 	lateResolves  []lateResolve
 	xLabels       map[string]labelDef
 	xLateResolves []lateResolve
+	origin        int
 }
 
 type labelDef struct {
@@ -59,8 +60,10 @@ func (ec *EmitContext) Resolve() {
 			panic("Label `" + lr.name + "` not found!")
 		}
 
+		old_offset := ec.offset
 		ec.offset = lr.pos
 		EmitLDC(ec, lr.op, uint32(v.pos))
+		ec.offset = old_offset
 	}
 
 	remXLateResolves := make([]lateResolve, 0)
@@ -72,8 +75,10 @@ func (ec *EmitContext) Resolve() {
 			remXLateResolves = append(remXLateResolves, xlr)
 		}
 
+		old_offset := ec.offset
 		ec.offset = xlr.pos
 		EmitLDC(ec, xlr.op, uint32(v.pos))
+		ec.offset = old_offset
 	}
 
 	ec.lateResolves = make([]lateResolve, 0)
@@ -399,6 +404,8 @@ func AsmLns(ec *EmitContext, i []string) error {
 }
 
 func Asm(ec *EmitContext, i string) error {
+	fmt.Printf("ASM [%08x] %q\n", ec.offset, i)
+
 	rawflds := strings.Fields(i)
 	flds := make([]string, 0)
 	for _, v := range rawflds {
@@ -437,12 +444,16 @@ func Asm(ec *EmitContext, i string) error {
 		}
 	} else if len(flds) == 2 {
 		switch flds[0] {
+		case ".origin":
+			v, _ := strconv.ParseInt(flds[1], 0, 32)
+
+			ec.origin = int(v)
 		case ".l":
 			name := flds[1]
 			pos := ec.offset
 			ld := labelDef{
 				name: name,
-				pos:  pos,
+				pos:  pos + ec.origin,
 			}
 
 			_, found := ec.labels[name]
@@ -457,7 +468,7 @@ func Asm(ec *EmitContext, i string) error {
 			pos := ec.offset
 			ld := labelDef{
 				name: name,
-				pos:  pos,
+				pos:  pos + ec.origin,
 			}
 
 			_, found := ec.xLabels[name]
@@ -521,11 +532,11 @@ func Asm(ec *EmitContext, i string) error {
 
 			switch flds[0] {
 			case ".lra":
-				EmitLDC(ec, OP_LDCA, uint32(v.pos))
+				EmitLDC(ec, OP_LDCA, uint32(v.pos+ec.origin))
 			case ".lrb":
-				EmitLDC(ec, OP_LDCB, uint32(v.pos))
+				EmitLDC(ec, OP_LDCB, uint32(v.pos+ec.origin))
 			case ".lrc":
-				EmitLDC(ec, OP_LDCC, uint32(v.pos))
+				EmitLDC(ec, OP_LDCC, uint32(v.pos+ec.origin))
 			default:
 				panic("can't handle this")
 			}

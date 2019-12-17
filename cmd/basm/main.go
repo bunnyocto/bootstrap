@@ -95,6 +95,18 @@ func processModuleFile(ec *asm.EmitContext, mod_file string, importPaths []strin
 	for sc.Scan() {
 		path := sc.Text()
 
+		if strings.HasPrefix(path, "!") {
+			flds := strings.SplitAfterN(path, "!", 2)
+			fmt.Printf("Raw: %q\n", flds[1])
+			err := asm.Asm(ec, flds[1])
+
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Could not complie assembly file %q: %q!", path, err.Error())
+				os.Exit(1)
+			}
+			continue
+		}
+
 		if strings.HasSuffix(path, ".M") {
 			processModuleFile(ec, path, importPaths)
 		} else if strings.HasSuffix(path, ".S") {
@@ -105,7 +117,13 @@ func processModuleFile(ec *asm.EmitContext, mod_file string, importPaths []strin
 				os.Exit(1)
 			}
 
-			asm.AsmReader(ec, fh)
+			err = asm.AsmReader(ec, fh)
+
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Could not compile assembly file %q: %q!", path, err.Error())
+				os.Exit(1)
+			}
+
 			ec.Resolve()
 		}
 	}

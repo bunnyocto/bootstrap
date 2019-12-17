@@ -1,29 +1,41 @@
 package main
 
-import "bootstrap/asm"
 import "bootstrap/cpu"
 import "flag"
 import "os"
+import "io/ioutil"
+import "fmt"
 
 func main() {
-	sfileptr := flag.String("sfile", "", "A *.S file to be run!")
+	fileptr := flag.String("bin", "", "A .bin file to be run")
 
 	flag.Parse()
 
-	if *sfileptr == "" {
-		panic("No `sfile` specified!")
+	if *fileptr == "" {
+		panic("No file specified!")
 	}
 
-	f, err := os.Open(*sfileptr)
+	f, err := os.Open(*fileptr)
 
 	if err != nil {
 		panic(err.Error())
 	}
+	
+	fileContents, err := ioutil.ReadAll(f)
+	
+	if err != nil {
+		panic(err.Error())
+	}
+	
+	memory := make([]uint8, 1024 + len(fileContents))
+	copy(memory[1024:], fileContents)
 
 	regs := make([]uint32, 0x10)
-	ec := asm.NewDefaultEmitContext()
-	asm.AsmReader(ec, f)
-	ec.Resolve()
 
-	cpu.Execute(regs, ec.Memory())
+	if cpu.Execute(regs, memory) != 0 {
+		fmt.Printf("Error on execute!")
+		os.Exit(1)
+	}
+	
+	os.Exit(0)
 }
