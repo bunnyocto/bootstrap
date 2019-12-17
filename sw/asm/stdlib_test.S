@@ -1,10 +1,11 @@
+.defm xcallc .xadrc #0 \ .call rc
+
 .l init
 	.adrc	stack
 	mov		ro	rc
 	
 .l std::test::run_tests
-	.xadrc	std::test::memcpy
-	.call	rc
+.m	xcallc	std::test::memcpy
 	
 	.xadrc	std::test::memcmp
 	.call	rc

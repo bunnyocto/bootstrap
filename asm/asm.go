@@ -18,6 +18,7 @@ type EmitContext struct {
 	xLateResolves []lateResolve
 	origin        int
 	saves         []uint8
+	macros        map[string]string
 }
 
 type labelDef struct {
@@ -37,6 +38,7 @@ func NewDefaultEmitContext() *EmitContext {
 		memory:  make([]uint8, 16),
 		labels:  make(map[string]labelDef),
 		xLabels: make(map[string]labelDef),
+		macros:  make(map[string]string),
 	}
 }
 
@@ -46,6 +48,7 @@ func NewEmitContext(offset int, memsz int) *EmitContext {
 		memory:  make([]uint8, memsz),
 		labels:  make(map[string]labelDef),
 		xLabels: make(map[string]labelDef),
+		macros:  make(map[string]string),
 	}
 }
 
@@ -424,6 +427,42 @@ func Asm(ec *EmitContext, i string) error {
 	if len(flds) >= 1 {
 		switch flds[0] {
 		case ".c":
+			return nil
+		case ".defm":
+			if len(flds) < 3 {
+				return fmt.Errorf("Invalid line: %q! Need more arguments.", i)
+			}
+
+			s := ""
+			for i := 2; i < len(flds); i++ {
+				s += flds[i] + " "
+			}
+			ec.macros[flds[1]] = s
+		case ".m":
+			if len(flds) < 2 {
+				return fmt.Errorf("Invalid line: %q! Need more arguments.", i)
+			}
+
+			macro, found := ec.macros[flds[1]]
+
+			if !found {
+				return fmt.Errorf("Invalid line: %q!Unknown macro: %q!", i, flds[1])
+			}
+
+			for i := 2; i < len(flds); i++ {
+				macro = strings.Replace(macro, fmt.Sprintf("#%d", i-2), flds[i], -1)
+			}
+
+			lns := strings.Split(macro, "\\")
+
+			for _, ln := range lns {
+				err := Asm(ec, ln)
+
+				if err != nil {
+					return err
+				}
+			}
+
 			return nil
 		}
 	}
