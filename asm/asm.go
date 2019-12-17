@@ -19,6 +19,14 @@ type EmitContext struct {
 	origin        int
 	saves         []uint8
 	macros        map[string]string
+	vars          map[string]uint8
+	labelCounter  uint32
+	nestingInfos  []nestingInfo
+}
+
+type nestingInfo struct {
+	counter uint32
+	kind    string
 }
 
 type labelDef struct {
@@ -34,21 +42,25 @@ type lateResolve struct {
 
 func NewDefaultEmitContext() *EmitContext {
 	return &EmitContext{
-		offset:  0,
-		memory:  make([]uint8, 16),
-		labels:  make(map[string]labelDef),
-		xLabels: make(map[string]labelDef),
-		macros:  make(map[string]string),
+		offset:       0,
+		memory:       make([]uint8, 16),
+		labels:       make(map[string]labelDef),
+		xLabels:      make(map[string]labelDef),
+		macros:       make(map[string]string),
+		vars:         make(map[string]uint8),
+		labelCounter: 0,
 	}
 }
 
 func NewEmitContext(offset int, memsz int) *EmitContext {
 	return &EmitContext{
-		offset:  offset,
-		memory:  make([]uint8, memsz),
-		labels:  make(map[string]labelDef),
-		xLabels: make(map[string]labelDef),
-		macros:  make(map[string]string),
+		offset:       offset,
+		memory:       make([]uint8, memsz),
+		labels:       make(map[string]labelDef),
+		xLabels:      make(map[string]labelDef),
+		macros:       make(map[string]string),
+		vars:         make(map[string]uint8),
+		labelCounter: 0,
 	}
 }
 
@@ -98,6 +110,24 @@ func (ec *EmitContext) GetXUnresolved() []string {
 	}
 
 	return strs
+}
+
+func EmitLabel(ec *EmitContext, name string) error {
+	pos := ec.offset
+	ld := labelDef{
+		name: name,
+		pos:  pos + ec.origin,
+	}
+
+	_, found := ec.labels[name]
+
+	if found {
+		return fmt.Errorf("Duplicate label: %q!", name)
+	}
+
+	ec.labels[name] = ld
+
+	return nil
 }
 
 func EmitBytes(ec *EmitContext, data []byte) error {
@@ -274,40 +304,48 @@ func Reg2Str(r uint8) string {
 	}
 }
 
-func Str2Reg(i string) (uint8, error) {
+func Str2Reg(i string, ec *EmitContext) (uint8, error) {
 	switch i {
-	case "ra", "A":
+	case "ra", "r1":
 		return REG_A, nil
-	case "rb", "B":
+	case "rb", "r2":
 		return REG_B, nil
-	case "rc", "C":
+	case "rc", "r3":
 		return REG_C, nil
-	case "rd", "D":
+	case "rd", "r4":
 		return REG_D, nil
-	case "re", "E":
+	case "re", "r5":
 		return REG_E, nil
-	case "rf", "F":
+	case "rf", "r6":
 		return REG_F, nil
-	case "rg", "G":
+	case "rg", "r7":
 		return REG_G, nil
-	case "rh", "H":
+	case "rh", "r8":
 		return REG_H, nil
-	case "ri", "I":
+	case "ri", "r9":
 		return REG_I, nil
-	case "rj", "J":
+	case "rj", "r10":
 		return REG_J, nil
-	case "rk", "K":
+	case "rk", "r11":
 		return REG_K, nil
-	case "rl", "L":
+	case "rl", "r12":
 		return REG_L, nil
-	case "rm", "M":
+	case "rm", "r13":
 		return REG_M, nil
-	case "rn", "N":
+	case "rn", "r14":
 		return REG_N, nil
-	case "ro", "O":
+	case "ro", "r15":
 		return REG_O, nil
-	case "rip", "IP":
+	case "rip", "r0":
 		return REG_IP, nil
+	}
+
+	if ec != nil {
+		r, found := ec.vars[i]
+
+		if found {
+			return r, nil
+		}
 	}
 
 	return 0, fmt.Errorf("Unknown register %q!", i)
@@ -469,6 +507,28 @@ func Asm(ec *EmitContext, i string) error {
 
 	if len(flds) == 1 {
 		switch flds[0] {
+		case ".end":
+			if len(ec.nestingInfos) < 1 {
+				return fmt.Errorf("Invalid line: %q! Nothing to end.", i)
+			}
+
+			ni := ec.nestingInfos[len(ec.nestingInfos)-1]
+			ec.nestingInfos = ec.nestingInfos[:len(ec.nestingInfos)-1]
+
+			switch ni.kind {
+			case "while":
+				err := AsmLns(ec, []string{
+					fmt.Sprintf(".adrc __L_%d_begin", ni.counter),
+					"jmp rc",
+				})
+
+				if err != nil {
+					return err
+				}
+			case "if":
+			}
+
+			return EmitLabel(ec, fmt.Sprintf("__L_%d_end", ni.counter))
 		case ".eof":
 			ec.saves = nil
 		case ".ret":
@@ -498,7 +558,7 @@ func Asm(ec *EmitContext, i string) error {
 	} else if len(flds) == 2 {
 		switch flds[0] {
 		case ".save":
-			r, err := Str2Reg(flds[1])
+			r, err := Str2Reg(flds[1], ec)
 
 			if err != nil {
 				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
@@ -508,7 +568,7 @@ func Asm(ec *EmitContext, i string) error {
 
 			return EmitOP(ec, OP_PUSH, REG_O, r)
 		case ".call":
-			r, err := Str2Reg(flds[1])
+			r, err := Str2Reg(flds[1], ec)
 
 			if err != nil {
 				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
@@ -523,20 +583,7 @@ func Asm(ec *EmitContext, i string) error {
 			v, _ := strconv.ParseInt(flds[1], 0, 32)
 			ec.offset += int(v)
 		case ".l":
-			name := flds[1]
-			pos := ec.offset
-			ld := labelDef{
-				name: name,
-				pos:  pos + ec.origin,
-			}
-
-			_, found := ec.labels[name]
-
-			if found {
-				return fmt.Errorf("Invalid line: %q! Duplicate label: %q!", i, name)
-			}
-
-			ec.labels[name] = ld
+			return EmitLabel(ec, flds[1])
 		case ".x":
 			name := flds[1]
 			pos := ec.offset
@@ -634,24 +681,65 @@ func Asm(ec *EmitContext, i string) error {
 				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
 			}
 
-			reg, err := Str2Reg(flds[1])
+			reg, err := Str2Reg(flds[1], ec)
 
 			if err != nil {
 				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
 			}
 
 			return EmitOP(ec, op, reg, 0)
+		case ".whilenz":
+			ec.labelCounter++
+			err := EmitLabel(ec, fmt.Sprintf("__L_%d_begin", ec.labelCounter))
+
+			if err != nil {
+				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+			}
+
+			err = AsmLns(ec, []string{
+				fmt.Sprintf(".adrc __L_%d_end", ec.labelCounter),
+				fmt.Sprintf("jiz rc %s", flds[1]),
+			})
+
+			if err != nil {
+				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+			}
+
+			ni := nestingInfo{
+				kind:    "while",
+				counter: ec.labelCounter,
+			}
+
+			ec.nestingInfos = append(ec.nestingInfos, ni)
+
+			return nil
 		default:
 			return fmt.Errorf("Invalid line: %q!", i)
 		}
 	} else if len(flds) == 3 {
+		switch flds[0] {
+		case ".var":
+			name := flds[1]
+			treg := flds[2]
+
+			reg, err := Str2Reg(treg, ec)
+
+			if err != nil {
+				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+			}
+
+			ec.vars[name] = reg
+
+			return nil
+		}
+
 		op, err := Str2Op(flds[0])
 
 		if err != nil {
 			return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
 		}
 
-		dst, err := Str2Reg(flds[1])
+		dst, err := Str2Reg(flds[1], ec)
 
 		if err != nil {
 			return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
@@ -664,13 +752,52 @@ func Asm(ec *EmitContext, i string) error {
 			return EmitOP(ec, op, dst, uint8(imm))
 		}
 
-		src, err := Str2Reg(flds[2])
+		src, err := Str2Reg(flds[2], ec)
 
 		if err != nil {
 			return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
 		}
 
 		return EmitOP(ec, op, dst, src)
+	} else if len(flds) == 4 {
+		switch flds[0] {
+		case ".if":
+			ec.labelCounter++
+			err := EmitLabel(ec, fmt.Sprintf("__L_%d_begin", ec.labelCounter))
+
+			if err != nil {
+				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+			}
+
+			op := ""
+
+			switch flds[1] {
+			case "eq":
+				op = "jne"
+			case "ne":
+				op = "jeq"
+			default:
+				return fmt.Errorf("Invalid line: %q! Invalid argument %q!", i, flds[1])
+			}
+
+			err = AsmLns(ec, []string{
+				fmt.Sprintf(".adrc __L_%d_end", ec.labelCounter),
+				fmt.Sprintf("%s %s %s", op, flds[2], flds[3]),
+			})
+
+			if err != nil {
+				return fmt.Errorf("Invalid line: %q! %s", i, err.Error())
+			}
+
+			ni := nestingInfo{
+				kind:    "if",
+				counter: ec.labelCounter,
+			}
+
+			ec.nestingInfos = append(ec.nestingInfos, ni)
+
+			return nil
+		}
 	}
 
 	return nil
