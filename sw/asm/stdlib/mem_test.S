@@ -24,12 +24,12 @@
 	
 	mov		ri	re
 	mov		rj	rf
-	call	rh
+	call	rh	ro
 	jiz		rc	rn
 	
 	mov		ri	re
 	mov		rj	rg
-	call	rh
+	call	rh	ro
 	jnz		rc	rn
 	
 	pop		rc	ro
