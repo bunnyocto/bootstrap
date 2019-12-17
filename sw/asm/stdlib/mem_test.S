@@ -1,3 +1,43 @@
+.l std::test::memcmp_buf1
+	strdata YWJjZGU=
+.l std::test::memcmp_buf2
+	strdata YWJjZGU=
+.l std::test::memcmp_buf3
+	strdata MTIzNDU=
+	
+.x std::test::memcmp
+	push	ro	rc
+	
+	.adrc	std::test::memcmp_buf1
+	mov		re	rc
+	
+	.adrc	std::test::memcmp_buf2
+	mov		rf	rc
+	
+	.adrc	std::test::memcmp_buf3
+	mov		rg	rc
+	
+	.xadrc	std::memcmp
+	mov		rh	rc
+	
+	.adrc	std::test::memcmp_fail
+	
+	mov		ri	re
+	mov		rj	rf
+	call	rh
+	jiz		rc	rn
+	
+	mov		ri	re
+	mov		rj	rg
+	call	rh
+	jnz		rc	rn
+	
+	pop		rc	ro
+	ret		ro
+	
+.l std::test::memcmp_fail
+	fail
+
 .l std::test::memcpy_origbuf
     strdata MTIzNDU=
 .l std::test::memcpy_cpybuf
